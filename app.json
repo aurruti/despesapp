@@ -1,0 +1,32 @@
+{
+  "expo": {
+    "name": "DespesApp",
+    "slug": "DespesApp-slug",
+    "version": "0.0.1",
+    "orientation": "vertical",
+    "icon": "./assets/images/placeholder.png",
+    "splash": {
+      "image": "./assets/images/placeholder.png",
+      "resizeMode": "contain", 
+      "backgroundColor": "#003080" 
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": false
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/placeholder.png",
+        "backgroundColor": "#FFFFFF"
+      }
+    },
+    "web": {
+      "favicon": "./assets/images/placeholder.png"
+    }
+  }
+}
