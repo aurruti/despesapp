@@ -111,8 +111,7 @@ export default function AddSpendingBox({currentSheet, currency, typelistFilePath
           <Button theme='addtypetext' label='Nou tipus' onPress={addTypeAction}/>
         </View>
       ) : (
-        <View style={[styles.innerBox, {top: 150, height:'45%'}]}>
-        <ScrollView contentContainerStyle={styles.buttoncontainer}>
+        <View style={[styles.innerBox, {alignItems:"center", flexDirection:"column", top: 140, height:'55%'}]}>
           <FlatList
             data={filteredTypes}
             renderItem={renderButton}
@@ -120,7 +119,6 @@ export default function AddSpendingBox({currentSheet, currency, typelistFilePath
             numColumns={3} 
           />
           <Button theme='addtypetext' label='Nou tipus' onPress={addTypeAction}/>
-        </ScrollView>
         </View>
       )}
     </View>

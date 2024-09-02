@@ -16,11 +16,6 @@ const typelistFilePath = `${FileSystem.documentDirectory}typelist.json`;
 const monthYearFilePath = `${FileSystem.documentDirectory}monthyear.json`;
 // const ngrokurl = ''; //DELETE?
 
-import * as SplashScreen from 'expo-splash-screen'; //REMOVE! (at some point)
-
-SplashScreen.preventAutoHideAsync(); //REMOVE! (at some point)
-setTimeout(SplashScreen.hideAsync, 5000); //REMOVE! (at some point)
-
 export default function App() {
   const [showAppOptions, setShowAppOptions] = useState(false);
   const [showAddSpending, setShowAddSpending] = useState(false);
