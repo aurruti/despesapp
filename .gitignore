@@ -6,6 +6,17 @@ node_modules/
 dist/
 web-build/
 
+#Build directories
+android/.gradle/
+android/app/build/
+android/app/client_secret_123895870085-7oncthmv7ebjh4c9dgu9oe1h1k2oipvs.apps.googleusercontent.com.json
+android/app/debug.keystore
+android/gradle.properties
+android/app/src/main/res/values/strings.xml
+ios/Pods/
+ios/DerivedData/
+ios/build/
+
 # Native
 *.orig.*
 *.jks
@@ -36,4 +47,7 @@ yarn-error.*
 *.tsbuildinfo
 
 # others
+android/app/release-key.jks
 .idea/
+.log
+.DS_Store

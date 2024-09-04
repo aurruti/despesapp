@@ -1,17 +1,19 @@
 import { useState, useEffect } from 'react';
 import { Alert, BackHandler, Text, ToastAndroid, View, StyleSheet } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-// import * as WebBrowser from 'expo-web-browser';
 
-import { EXPO_CLIENT_ID, IOS_CLIENT_ID, ANDROID_CLIENT_ID, WEB_CLIENT_ID, EXPO_URI } from '@env';
-// import * as FileSystem from 'expo-file-system';
-// import * as DocumentPicker from 'expo-document-picker';
+import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
+import { WEB_CLIENT_ID } from '@env';
 
 import Button from './Button';
 import CircleButton from './CircleButton';
 // import AddTypeBox from './AddTypeBox'; // FUTURE FEATURE
 
-// WebBrowser.maybeCompleteAuthSession();
+// Configure Google Sign-In
+GoogleSignin.configure({
+  webClientId: WEB_CLIENT_ID, // From Google Cloud Console
+  offlineAccess: true,
+});
 
 export default function SettingsScreen ({
   showAppOptions, setShowAppOptions,
@@ -20,6 +22,24 @@ export default function SettingsScreen ({
   currentSheet, typelistFilePath,
   triggerTestScript
 }) {
+
+  const signIn = async () => {
+    try {
+      await GoogleSignin.hasPlayServices();
+      const userInfo = await GoogleSignin.signIn();
+      console.log("Check: Informació d'usuari", userInfo);
+    } catch (error) {
+      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+        console.error('User cancelled the login flow');
+      } else if (error.code === statusCodes.IN_PROGRESS) {
+        console.error('Autenticació en progrés');
+      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+        console.error('Play services no està disponible o està desactualitzat');
+      } else {
+        console.error('Alguna cosa no ha funcionat: ', error);
+      }
+    }
+  };
 
   exitAction = () => {
     setShowAddType(false);
@@ -54,7 +74,7 @@ export default function SettingsScreen ({
       </View>
       <View>
         {/*TO-DO tipus de despesa, scroll thingy, change defaults, etc*/}
-        <Button label="Autentica't a Google" onPress={()=> { promptAsync();} }/>
+        <Button label="Autentica't a Google" onPress={signIn}/>
         <Button label="Test button" onPress={triggerTestScript} /> 
       </View>
       <StatusBar style="dark" />
