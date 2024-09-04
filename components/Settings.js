@@ -1,13 +1,17 @@
 import { useState, useEffect } from 'react';
 import { Alert, BackHandler, Text, ToastAndroid, View, StyleSheet } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+// import * as WebBrowser from 'expo-web-browser';
 
-import * as FileSystem from 'expo-file-system';
-import * as DocumentPicker from 'expo-document-picker';
+import { EXPO_CLIENT_ID, IOS_CLIENT_ID, ANDROID_CLIENT_ID, WEB_CLIENT_ID, EXPO_URI } from '@env';
+// import * as FileSystem from 'expo-file-system';
+// import * as DocumentPicker from 'expo-document-picker';
 
 import Button from './Button';
 import CircleButton from './CircleButton';
-import AddTypeBox from './AddTypeBox';
+// import AddTypeBox from './AddTypeBox'; // FUTURE FEATURE
+
+// WebBrowser.maybeCompleteAuthSession();
 
 export default function SettingsScreen ({
   showAppOptions, setShowAppOptions,
@@ -24,6 +28,7 @@ export default function SettingsScreen ({
   }
 
   useEffect(()=>{
+  // Handle Back Button Press
     const handleBackButtonPress = () => {
       exitAction();
       return true;
@@ -49,6 +54,7 @@ export default function SettingsScreen ({
       </View>
       <View>
         {/*TO-DO tipus de despesa, scroll thingy, change defaults, etc*/}
+        <Button label="Autentica't a Google" onPress={()=> { promptAsync();} }/>
         <Button label="Test button" onPress={triggerTestScript} /> 
       </View>
       <StatusBar style="dark" />

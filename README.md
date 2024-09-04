@@ -2,6 +2,8 @@
 DespesApp is a tool to simplify spending tracking.
 Developed with React Native + Expo.
 
+This is very much WIP!
+
 ## CC BY-SA 4.0 Licensing
 DespesApp © 2024 by Aitor Urruticoechea is licensed under CC BY-SA 4.0. To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/4.0/
 

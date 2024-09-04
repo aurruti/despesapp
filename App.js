@@ -14,7 +14,6 @@ import appStartup from './fun/filestartup.js';
 const preferencesFilePath = `${FileSystem.documentDirectory}preferences.json`;
 const typelistFilePath = `${FileSystem.documentDirectory}typelist.json`;
 const monthYearFilePath = `${FileSystem.documentDirectory}monthyear.json`;
-// const ngrokurl = ''; //DELETE?
 
 export default function App() {
   const [showAppOptions, setShowAppOptions] = useState(false);

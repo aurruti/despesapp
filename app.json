@@ -1,14 +1,13 @@
 {
   "expo": {
     "name": "DespesApp",
-    "slug": "DespesApp-slug",
+    "slug": "despesapp",
     "version": "0.0.1",
-    "orientation": "vertical",
-    "icon": "./assets/images/placeholder.png",
+    "icon": "./assets/icon_prov.png",
     "splash": {
       "image": "./assets/images/placeholder.png",
-      "resizeMode": "contain", 
-      "backgroundColor": "#181520" 
+      "resizeMode": "contain",
+      "backgroundColor": "#181520"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
@@ -23,10 +22,17 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/placeholder.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "package": "com.aurruti.despesapp"
     },
     "web": {
       "favicon": "./assets/images/placeholder.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "68c68e08-9318-43cd-a1bc-c84554a8f39c"
+      }
+    },
+    "owner": "aurruti"
   }
 }
