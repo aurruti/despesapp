@@ -51,3 +51,5 @@ android/app/release-key.jks
 .idea/
 .log
 .DS_Store
+__tests__
+.bundle
