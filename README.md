@@ -1,6 +1,6 @@
 # DespesApp
 DespesApp is a tool to simplify spending tracking.
-Developed with React Native + Expo.
+Developed with React Native + Expo for the frontend; while a relatively simple fastAPI handles backend calls. For the backend deployement and more, take a look at the server actually handling this, https://github.com/aurruti/naidd .
 
 This is very much WIP!
 
