@@ -1,19 +1,17 @@
-import { useState, useEffect } from 'react';
-import { Alert, BackHandler, Text, ToastAndroid, View, StyleSheet } from 'react-native';
+import { useEffect } from 'react';
+import { BackHandler, Text, TextInput, ToastAndroid, View, StyleSheet } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-
-// import { EXPO_CLIENT_ID, IOS_CLIENT_ID, ANDROID_CLIENT_ID, WEB_CLIENT_ID, EXPO_URI } from '@env';
 
 import Button from './Button';
 import CircleButton from './CircleButton';
+import SettingsBox from './SettingsBox';
 
 
 export default function SettingsScreen ({
   showAppOptions, setShowAppOptions,
   showAddType, setShowAddType,
   showAddSpending, setShowAddSpending,
-  currentSheet, typelistFilePath,
-  triggerTestScript
+  preferencesFilePath
 }) {
 
   exitAction = () => {
@@ -45,12 +43,16 @@ export default function SettingsScreen ({
           setShowAddType(false); setShowAddSpending(false);}} 
         />
         <View style={[styles.placeholder, {flex:5/6}]} />
-        <Text style={styles.title}> Ajustaments </Text>
+        <Text style={styles.title}> Configuració </Text>
       </View>
-      <View>
-        {/*TO-DO tipus de despesa, scroll thingy, change defaults, etc*/}
-        <Button label="Autentica't a Google" onPress={()=> { promptAsync();} }/>
-        <Button label="Test button" onPress={triggerTestScript} /> 
+      <View style={{justifyContent:"center", alignItems:"center"}}>
+        <Button label="Autentica't a Google" onPress={()=> ToastAndroid.show("Encara no disponible", ToastAndroid.SHORT) }/>
+        <View style={styles.settingsContainer}>
+          <SettingsBox title="Codi d'Idioma" preferenceName="language" preferencesFilePath={preferencesFilePath}/>
+          <SettingsBox title="Símbol de Moneda" preferenceName="currency" preferencesFilePath={preferencesFilePath}/>
+          <SettingsBox title="Offset de Columna" preferenceName="colOffset" preferencesFilePath={preferencesFilePath}/>
+          <SettingsBox title="Offset de Fila" preferenceName="rowOffset" preferencesFilePath={preferencesFilePath}/>
+        </View>
       </View>
       <StatusBar style="dark" />
     </View>
@@ -64,25 +66,36 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingBottom: 25,
-    gap:12,
+    gap: 12,
   },
-  title : {
+  title: {
     color: 'white',
-    fontSize: 18,
+    paddingTop: 2,
+    fontSize: 27,
     fontWeight: 'bold',
   },
   topContainer: {
-    flexDirection: 'row-reverse', 
-    justifyContent: 'flex-start', 
-    alignItems: 'center', 
-    height: 60, 
-    width: '100%', 
-    position: 'absolute', 
+    flexDirection: 'row-reverse',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    height: 60,
+    width: '100%',
+    position: 'absolute',
     top: 60,
-    zIndex:-10,
+    zIndex: -10,
+  },
+  settingsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    width: '100%',
+    paddingTop: '10%',
+    paddingLeft: '5%',
+    paddingRight: '5%',
   },
   placeholder: {
-    flex: 1, 
-    backgroundColor: 'transparent', 
+    flex: 1,
+    backgroundColor: 'transparent',
   },
 });

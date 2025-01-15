@@ -66,50 +66,6 @@ export default function App() {
     Startup();
   }, []);
 
-  const triggerTestScript = async () => {
-    try {
-      const response = await fetch(ngrokurl + 'test-script', {
-        headers: {
-          'ngrok-skip-browser-warning': 'true',
-        },
-      });
-      const data = await response.json();
-      Alert.alert('Bon Test!', data.message);
-    } catch (e) {
-      console.log(e);
-      Alert.alert('Error', "No s'ha pogut exectuar el test.");
-    }
-  };
-
-  const triggerAdd100Script = async () => {
-    const data = {
-      where: 'localcsv',
-      file: 'despesa.csv',
-      month: 'Agost',
-      month_row: 0,
-      money_type: 'Altres',
-      money_type_col: 0,
-      money: 100,
-      col_offset: 0,
-    };
-
-    try {
-      const response = await fetch(ngrokurl + 'add-expense', {
-        method: 'POST',
-        headers: {
-          'ngrok-skip-browser-warning': 'true',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-
-      const result = await response.json();
-      Alert.alert('Fet!', result.message);
-    } catch (error) {
-      Alert.alert('Error', 'Alguna cosa no ha anat bé...');
-    }
-  };
-
   const triggerAddSpend = async () => {
     ToastAndroid.show(
       "La despesa s'ha afegit correctament",
@@ -130,7 +86,7 @@ export default function App() {
           setShowAddType={setShowAddType}
           showAddSpending={showAddSpending}
           setShowAddSpending={setShowAddSpending}
-          triggerTestScript={triggerTestScript}
+          preferencesFilePath={preferencesFilePath}
         />
       ) : (
         <>
