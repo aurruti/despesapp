@@ -12,16 +12,12 @@
     "@react-native-community/slider": "4.5.2",
     "expo": "~51.0.28",
     "expo-asset": "~10.0.10",
-    "expo-auth-session": "~5.5.2",
     "expo-constants": "~16.0.2",
     "expo-crypto": "~13.0.2",
-    "expo-dev-client": "~4.0.25",
-    "expo-document-picker": "~12.0.2",
     "expo-file-system": "~17.0.1",
     "expo-random": "~14.0.1",
-    "expo-splash-screen": "~0.27.5",
+    "expo-splash-screen": "~0.27.7",
     "expo-status-bar": "~1.12.1",
-    "gapi-script": "^1.2.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-native": "0.74.5",
@@ -34,5 +30,7 @@
   "devDependencies": {
     "@babel/core": "^7.20.0"
   },
-  "private": true
+  "private": true,
+  "name": "expo-app",
+  "version": "1.0.0"
 }
