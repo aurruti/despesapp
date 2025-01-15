@@ -11,6 +11,8 @@ export default function SettingsScreen ({
   showAppOptions, setShowAppOptions,
   showAddType, setShowAddType,
   showAddSpending, setShowAddSpending,
+  setLanguage, setCurrency,
+  setRowOffset, setColOffset,
   preferencesFilePath
 }) {
 
@@ -47,11 +49,16 @@ export default function SettingsScreen ({
       </View>
       <View style={{justifyContent:"center", alignItems:"center"}}>
         <Button label="Autentica't a Google" onPress={()=> ToastAndroid.show("Encara no disponible", ToastAndroid.SHORT) }/>
+        <View style={styles.placeholder} />
         <View style={styles.settingsContainer}>
-          <SettingsBox title="Codi d'Idioma" preferenceName="language" preferencesFilePath={preferencesFilePath}/>
-          <SettingsBox title="Símbol de Moneda" preferenceName="currency" preferencesFilePath={preferencesFilePath}/>
-          <SettingsBox title="Offset de Columna" preferenceName="colOffset" preferencesFilePath={preferencesFilePath}/>
-          <SettingsBox title="Offset de Fila" preferenceName="rowOffset" preferencesFilePath={preferencesFilePath}/>
+          <SettingsBox title="Codi d'Idioma" preferenceName="language" preferencesFilePath={preferencesFilePath}
+            setPreferenceVar={setLanguage}/>
+          <SettingsBox title="Símbol de Moneda" preferenceName="currency" preferencesFilePath={preferencesFilePath}
+            setPreferenceVar={setCurrency}/>
+          <SettingsBox title="Offset de Columna" preferenceName="colOffset" preferencesFilePath={preferencesFilePath}
+            setPreferenceVar={setColOffset}/>
+          <SettingsBox title="Offset de Fila" preferenceName="rowOffset" preferencesFilePath={preferencesFilePath}
+            setPreferenceVar={setRowOffset}/>
         </View>
       </View>
       <StatusBar style="dark" />
@@ -91,11 +98,11 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     width: '100%',
     paddingTop: '10%',
-    paddingLeft: '5%',
-    paddingRight: '5%',
+    paddingLeft: '10%',
+    paddingRight: '10%',
+    rowGap: 20,
   },
   placeholder: {
-    flex: 1,
-    backgroundColor: 'transparent',
+    height: "20%",
   },
 });

@@ -24,6 +24,8 @@ export default function App() {
 
   const [language, setLanguage] = useState('');
   const [currency, setCurrency] = useState('');
+  const [colOffset, setColOffset] = useState(0);
+  const [rowOffset, setRowOffset] = useState(0);
   const [currentSheet, setCurrentSheet] = useState('');
 
   const [currentMonth, setCurrentMonth] = useState('');
@@ -47,10 +49,12 @@ export default function App() {
         );
 
         const preferencesData = await FileSystem.readAsStringAsync(preferencesFilePath);
-        const { language, currency, lastSheet } = JSON.parse(preferencesData);
+        const { language, currency, lastSheet, colOffset, rowOffset } = JSON.parse(preferencesData);
         setLanguage(language);
         setCurrency(currency);
         setCurrentSheet(lastSheet);
+        setColOffset(colOffset);
+        setRowOffset(rowOffset);
 
         const monthYearData = await FileSystem.readAsStringAsync(monthYearFilePath);
         const [timeEntry] = JSON.parse(monthYearData);
@@ -86,6 +90,10 @@ export default function App() {
           setShowAddType={setShowAddType}
           showAddSpending={showAddSpending}
           setShowAddSpending={setShowAddSpending}
+          setLanguage={setLanguage}
+          setCurrency={setCurrency}
+          setRowOffset={setRowOffset}
+          setColOffset={setColOffset}
           preferencesFilePath={preferencesFilePath}
         />
       ) : (
@@ -141,7 +149,7 @@ export default function App() {
           )}
           <View style={styles.optionsRow}>
             <Button theme="spreadsheet" label={currentSheet} onPress = {()=> Alert.alert("No disponible", "L'opció de canviar de full de despeses encara no està implementada. Vindrà en properes actualizacions de l'app!")} />
-            <Button theme="month" label={currentMonthYearLoc} onPress={()=>{
+            <Button theme="month" label={showMonthPicker ? "Torna a l'inici" : currentMonthYearLoc} onPress={()=>{
                 setShowMonthPicker(!showMonthPicker); setShowAddType(false); 
                 setShowFilePicker(false); setShowAddSpending(false)
               }} />

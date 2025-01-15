@@ -40,7 +40,6 @@ jobs:
     
       - name: Build Expo app 
         run: |
-          cd expo-app
           npx eas build -p android --local
 
 

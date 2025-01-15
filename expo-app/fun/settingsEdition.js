@@ -11,6 +11,10 @@ export default async function settingsEdition(
     if (preferenceName === 'colOffset' || preferenceName === 'rowOffset') {
         try {
             newPreferenceValue = parseInt(newPreferenceValue);
+            if (isNaN(newPreferenceValue)) {
+                console.error('Error converting offset to integer:', newPreferenceValue);
+                newPreferenceValue = ogValue;
+            }
         } catch (error) {
             console.error('Error converting offset to integer:', error);
             newPreferenceValue = ogValue;   
@@ -21,7 +25,6 @@ export default async function settingsEdition(
         await FileSystem.writeAsStringAsync(preferencesFilePath, JSON.stringify(preferences));
     } catch (error) {
         console.error('Error writing new preferences:', error);
-        preferences[preferenceName] = ogValue;
     }
-    return newPreferenceValue;
+    return preferences;
 };

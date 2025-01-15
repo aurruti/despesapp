@@ -6,16 +6,18 @@ import settingsEdition from '../fun/settingsEdition';
 
 export default function SettingsBox({
     title, preferenceName,
-    preferencesFilePath
+    preferencesFilePath,
+    setPreferenceVar
 }) {
     const [preferenceValue, setPreferenceValue] = useState('');
+    let preferences = {};
 
     useEffect(() => {
         const loadPreference = async () => {
             try {
-                let preferences = JSON.parse(await FileSystem.readAsStringAsync(preferencesFilePath));
+                preferences = JSON.parse(await FileSystem.readAsStringAsync(preferencesFilePath));
                 if (preferenceName === 'colOffset' || preferenceName === 'rowOffset') {
-                    preferences[preferenceName] = parseInt(preferences[preferenceName]);
+                    preferences[preferenceName] = String(preferences[preferenceName]);
                 }
                 setPreferenceValue(preferences[preferenceName] || '');
             } catch (error) {
@@ -26,43 +28,38 @@ export default function SettingsBox({
         loadPreference();
     }, [preferencesFilePath, preferenceName]);
 
-    const handleTextChange = async (text) => {
+    const handleText = async () => {
         try {
-            await settingsEdition(preferencesFilePath, preferenceName, text);
-            ToastAndroid.show('Preference updated!', ToastAndroid.SHORT);
+            preferences = await settingsEdition(preferencesFilePath, preferenceName, preferenceValue);
+            ToastAndroid.show("S'han actualitzat les preferències", ToastAndroid.SHORT);
             console.log("New preferences saved: ", preferences);
         } catch (error) {
-            ToastAndroid.show('Error updating preference', ToastAndroid.SHORT);
+            console.error('Error updating preference:', error);
+            ToastAndroid.show('Error en actualitzar les preferències', ToastAndroid.SHORT);
         }
+        setPreferenceVar(preferenceValue);
     };
 
+    let formattedText = '';
     const checkText = (text) => {
-        // switch (preferenceName) {
-        //     case 'language':
-        //         if (!/^[a-zA-Z]{2}$/.test(text)) {
-        //             ToastAndroid.show("Codi d'idioma invàlid", ToastAndroid.SHORT);
-        //             setPreferenceValue(preferences[preferenceName] || '');
-        //         }
-        //         break;
-        //     case 'currency':
-        //         if (!/^[A-Z]{3}$/.test(text) && !['€', '$', '¥'].includes(text)) {
-        //             ToastAndroid.show('Símbol de moneda invàlid', ToastAndroid.SHORT);
-        //             setPreferenceValue(preferences[preferenceName] || '');
-        //         }
-        //         break;
-        //     case 'colOffset':
-        //         if (!/^\d+$/.test(text) || text.includes('.') || parseInt(text) < 0) {
-        //             ToastAndroid.show('Offset invàlid', ToastAndroid.SHORT);
-        //             setPreferenceValue(preferences[preferenceName] || '');
-        //         }
-        //         break;
-        //     case 'rowOffset':
-        //         if (!/^\d+$/.test(text) || text.includes('.') || parseInt(text) < 0) {
-        //             ToastAndroid.show('Offset invàlid', ToastAndroid.SHORT);
-        //             setPreferenceValue(preferences[preferenceName] || '');
-        //         }
-        //         break;
-        // }
+        switch (preferenceName) {
+            case 'language':
+                formattedText = text.replace(/[^a-z]/g, '');
+                setPreferenceValue(formattedText);
+                break;
+            case 'currency':
+                formattedText = text.replace(/[^a-zA-Z€$¥]/g, '');
+                setPreferenceValue(formattedText);
+                break;
+            case 'colOffset':
+                formattedText = text.replace(/[^0-9]/g, '');
+                setPreferenceValue(formattedText);
+                break;
+            case 'rowOffset':
+                formattedText = text.replace(/[^0-9]/g, '');
+                setPreferenceValue(formattedText);
+                break;
+        }
     };
 
     return (
@@ -71,8 +68,11 @@ export default function SettingsBox({
             <TextInput 
                 style={styles.input} 
                 value={preferenceValue}
-                //onEditing={checkText}
-                onEndEditing={handleTextChange}
+                onChangeText={checkText}
+                onEndEditing={handleText}
+                onPressOut={handleText}
+                maxLength={3}
+                keyboardType= {preferenceName === 'colOffset' || preferenceName === 'rowOffset' ? 'numeric' : 'default'}
             />
         </View>
     )
@@ -83,9 +83,7 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'flex-start',
-        paddingLeft: 10,
-        width: '40%',
-        height: '40%',
+        width: '45%',
     },
     miniTitle : {
         color: 'white',
