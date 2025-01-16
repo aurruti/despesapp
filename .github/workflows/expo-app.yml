@@ -5,42 +5,39 @@ on:
     branches:
       - main
     paths:
-      - 'expo-app/**'
-      - '.github/workflows/expo-app.yml'
+      - "expo-app/**"
+      - ".github/workflows/expo-app.yml"
   pull_request:
     branches:
       - main
     paths:
-      - 'expo-app/**'
-      - '.github/workflows/expo-app.yml'
+      - "expo-app/**"
+      - ".github/workflows/expo-app.yml"
 
 jobs:
- android-build:
+  android-build:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
-    
+
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-            node-version: '14'
-    
+          node-version: "14"
+
       - name: Install Expo CLI
         run: npm install -g expo-cli
-    
+
       - name: Install Eas CLI
         run: npm install -g eas-cli
-    
+
       - name: Install dependencies
-        run: | 
+        run: |
           cd expo-app
           npm install
-    
-      - name: Build Expo app 
+
+      - name: Build Expo app
         run: |
-          npx eas build -p android --local
-
-
-    
+          eas build -p android --local

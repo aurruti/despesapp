@@ -15,8 +15,10 @@
     "assetBundlePatterns": [
       "**/*"
     ],
+    "scheme": "com.despesapp",
     "ios": {
-      "supportsTablet": false
+      "supportsTablet": false,
+      "bundleIdentifier": "com.aurruti.despesapp"
     },
     "android": {
       "adaptiveIcon": {
@@ -33,6 +35,9 @@
         "projectId": "68c68e08-9318-43cd-a1bc-c84554a8f39c"
       }
     },
-    "owner": "aurruti"
+    "owner": "aurruti",
+    "plugins": [
+      "expo-secure-store"
+    ]
   }
 }

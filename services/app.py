@@ -77,7 +77,7 @@ async def startup_event():
 async def check_api():
     return {"status": True}
 
-@app.get("/oauth/callback")
+@app.get("/api/oauth/callback")
 async def oauth_callback(request: Request, db: aiosqlite.Connection = Depends(get_db)):
     # Get the authorization code from the query parameters
     code = request.query_params.get("code")
@@ -89,7 +89,7 @@ async def oauth_callback(request: Request, db: aiosqlite.Connection = Depends(ge
         "code": code,
         "client_id": env["GOOGLE_CLIENT_ID"],
         "client_secret": env["GOOGLE_CLIENT_SECRET"],
-        "redirect_uri": "https://despesapp.naidd.duckdns.org/oauth/callback",
+        "redirect_uri": "https://despesapp.naidd.duckdns.org/api/oauth/callback",
         "grant_type": "authorization_code",
     }
 
