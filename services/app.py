@@ -1,3 +1,4 @@
+import uvicorn
 from fastapi import FastAPI, Request, HTTPException, Depends
 from fastapi.security import OAuth2PasswordBearer
 from fastapi.middleware.cors import CORSMiddleware
@@ -77,7 +78,7 @@ async def startup_event():
 async def check_api():
     return {"status": True}
 
-@app.get("/oauth/callback")
+@app.get("/api/oauth/callback")
 async def oauth_callback(request: Request, db: aiosqlite.Connection = Depends(get_db)):
     # Get the authorization code from the query parameters
     code = request.query_params.get("code")
@@ -89,7 +90,7 @@ async def oauth_callback(request: Request, db: aiosqlite.Connection = Depends(ge
         "code": code,
         "client_id": env["GOOGLE_CLIENT_ID"],
         "client_secret": env["GOOGLE_CLIENT_SECRET"],
-        "redirect_uri": "https://despesapp.naidd.duckdns.org/oauth/callback",
+        "redirect_uri": "https://despesapp.naidd.duckdns.org/api/oauth/callback",
         "grant_type": "authorization_code",
     }
 
@@ -195,3 +196,8 @@ async def logout(
     return {"status": "Logged out successfully"}
 
 
+
+
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)
