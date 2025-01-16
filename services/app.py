@@ -4,7 +4,7 @@ from fastapi.security import OAuth2PasswordBearer
 from fastapi.middleware.cors import CORSMiddleware
 import aiosqlite
 import httpx
-from os import environ as env
+from os import getenv as env
 from datetime import datetime, timedelta
 import jwt
 
@@ -28,8 +28,8 @@ app.add_middleware(
 
 
 # Encryption settings
-JWT_SECRET = env["JWT_SECRET"]
-JWT_ALGORITHM = env["JWT_ALGORITHM"]
+JWT_SECRET = env("JWT_SECRET")
+JWT_ALGORITHM = env("JWT_ALGORITHM")
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
@@ -88,8 +88,8 @@ async def oauth_callback(request: Request, db: aiosqlite.Connection = Depends(ge
     # Prepare the token request data
     token_data = {
         "code": code,
-        "client_id": env["GOOGLE_CLIENT_ID"],
-        "client_secret": env["GOOGLE_CLIENT_SECRET"],
+        "client_id": env("GOOGLE_CLIENT_ID"),
+        "client_secret": env("GOOGLE_CLIENT_SECRET"),
         "redirect_uri": "https://despesapp.naidd.duckdns.org/api/oauth/callback",
         "grant_type": "authorization_code",
     }
@@ -153,8 +153,8 @@ async def refresh_token(
 
     # Refresh token request to Google
     refresh_data = {
-        "client_id": env["GOOGLE_CLIENT_ID"],
-        "client_secret": env["GOOGLE_CLIENT_SECRET"],
+        "client_id": env("GOOGLE_CLIENT_ID"),
+        "client_secret": env("GOOGLE_CLIENT_SECRET"),
         "refresh_token": stored_refresh_token,
         "grant_type": "refresh_token",
     }
@@ -200,4 +200,5 @@ async def logout(
 
 
 if __name__ == "__main__":
+    print(JWT_SECRET)
     uvicorn.run(app, host="0.0.0.0", port=8000)

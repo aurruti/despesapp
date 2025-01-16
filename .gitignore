@@ -39,5 +39,6 @@ yarn-error.*
 
 # others
 venv/
+__pycache__/
 .idea/
 *.db
