@@ -1,16 +1,17 @@
 import { useEffect } from 'react';
-import { BackHandler, Text, TextInput, ToastAndroid, View, StyleSheet } from 'react-native';
+import { BackHandler, Text, View, StyleSheet } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 
+import { loginGoogle, checkSession, logoutGoogle } from '../fun/googleFun.js';
 import Button from './Button';
 import CircleButton from './CircleButton';
 import SettingsBox from './SettingsBox';
 
 
 export default function SettingsScreen ({
-  showAppOptions, setShowAppOptions,
-  showAddType, setShowAddType,
-  showAddSpending, setShowAddSpending,
+  setShowAppOptions,
+  setShowAddType,
+  setShowAddSpending,
   setLanguage, setCurrency,
   setRowOffset, setColOffset,
   preferencesFilePath
@@ -48,7 +49,9 @@ export default function SettingsScreen ({
         <Text style={styles.title}> Configuració </Text>
       </View>
       <View style={{justifyContent:"center", alignItems:"center"}}>
-        <Button label="Autentica't a Google" onPress={()=> ToastAndroid.show("Encara no disponible", ToastAndroid.SHORT) }/>
+        <Button label="Autentica't a Google" onPress={async () => await loginGoogle() }/>
+        <Button label="Comprova la sessió" onPress={async () => await checkSession() }/>
+        <Button label="Tanca la sessió" onPress={async () => await logoutGoogle() }/>
         <View style={styles.placeholder} />
         <View style={styles.settingsContainer}>
           <SettingsBox title="Codi d'Idioma" preferenceName="language" preferencesFilePath={preferencesFilePath}

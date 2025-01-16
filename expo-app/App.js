@@ -82,13 +82,8 @@ export default function App() {
     <View style={styles.container}>
       {showAppOptions ? (
         <SettingsScreen
-          currentSheet={currentSheet}
-          typelistFilePath={typelistFilePath}
-          showAppOptions={showAppOptions}
           setShowAppOptions={setShowAppOptions}
-          showAddType={showAddType}
           setShowAddType={setShowAddType}
-          showAddSpending={showAddSpending}
           setShowAddSpending={setShowAddSpending}
           setLanguage={setLanguage}
           setCurrency={setCurrency}

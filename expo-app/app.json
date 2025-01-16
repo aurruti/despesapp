@@ -15,17 +15,17 @@
     "assetBundlePatterns": [
       "**/*"
     ],
-    "scheme": "com.despesapp",
+    "scheme": "cat.aurruti.despesapp",
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.aurruti.despesapp"
+      "bundleIdentifier": "cat.aurruti.despesapp"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/placeholder.png",
         "backgroundColor": "#FFFFFF"
       },
-      "package": "com.aurruti.despesapp"
+      "package": "cat.aurruti.despesapp"
     },
     "web": {
       "favicon": "./assets/images/placeholder.png"
