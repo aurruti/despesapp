@@ -9,6 +9,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#181520"
     },
+    "newArchEnabled": true,
     "updates": {
       "fallbackToCacheTimeout": 0
     },
@@ -37,7 +38,8 @@
     },
     "owner": "aurruti",
     "plugins": [
-      "expo-secure-store"
+      "expo-secure-store",
+      "expo-asset"
     ]
   }
 }

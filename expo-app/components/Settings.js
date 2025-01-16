@@ -1,36 +1,36 @@
-import { useEffect } from 'react';
-import { BackHandler, Text, View, StyleSheet } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
+import { useEffect } from "react";
+import { BackHandler, Text, View, StyleSheet } from "react-native";
+import { StatusBar } from "expo-status-bar";
 
-import { loginGoogle, checkSession, logoutGoogle } from '../fun/googleFun.js';
-import Button from './Button';
-import CircleButton from './CircleButton';
-import SettingsBox from './SettingsBox';
+import { loginGoogle, checkSession, logoutGoogle } from "../fun/googleFun.js";
+import Button from "./Button";
+import CircleButton from "./CircleButton";
+import SettingsBox from "./SettingsBox";
 
-
-export default function SettingsScreen ({
+export default function SettingsScreen({
   setShowAppOptions,
   setShowAddType,
   setShowAddSpending,
-  setLanguage, setCurrency,
-  setRowOffset, setColOffset,
-  preferencesFilePath
+  setLanguage,
+  setCurrency,
+  setRowOffset,
+  setColOffset,
+  preferencesFilePath,
 }) {
-
   exitAction = () => {
     setShowAddType(false);
     setShowAddSpending(false);
     setShowAppOptions(false);
-  }
+  };
 
-  useEffect(()=>{
-  // Handle Back Button Press
+  useEffect(() => {
+    // Handle Back Button Press
     const handleBackButtonPress = () => {
       exitAction();
       return true;
     };
     const backHandler = BackHandler.addEventListener(
-      'hardwareBackPress',
+      "hardwareBackPress",
       handleBackButtonPress
     );
     return () => {
@@ -41,68 +41,97 @@ export default function SettingsScreen ({
   return (
     <View style={styles.container}>
       <View style={styles.topContainer}>
-        <CircleButton type='exit-top' border='#25292e' 
-          onPress={() => {setShowAppOptions(false); 
-          setShowAddType(false); setShowAddSpending(false);}} 
+        <CircleButton
+          type="exit-top"
+          border="#25292e"
+          onPress={() => {
+            setShowAppOptions(false);
+            setShowAddType(false);
+            setShowAddSpending(false);
+          }}
         />
-        <View style={[styles.placeholder, {flex:5/6}]} />
+        <View style={[styles.placeholder, { flex: 5 / 6 }]} />
         <Text style={styles.title}> Configuració </Text>
       </View>
-      <View style={{justifyContent:"center", alignItems:"center"}}>
-        <Button label="Autentica't a Google" onPress={async () => await loginGoogle() }/>
-        <Button label="Comprova la sessió" onPress={async () => await checkSession() }/>
-        <Button label="Tanca la sessió" onPress={async () => await logoutGoogle() }/>
+      <View style={{ justifyContent: "center", alignItems: "center" }}>
+        <Button
+          label="Autentica't a Google"
+          onPress={async () => await loginGoogle()}
+        />
+        <Button
+          label="Comprova la sessió"
+          onPress={async () => await checkSession()}
+        />
+        <Button
+          label="Tanca la sessió"
+          onPress={async () => await logoutGoogle()}
+        />
         <View style={styles.placeholder} />
         <View style={styles.settingsContainer}>
-          <SettingsBox title="Codi d'Idioma" preferenceName="language" preferencesFilePath={preferencesFilePath}
-            setPreferenceVar={setLanguage}/>
-          <SettingsBox title="Símbol de Moneda" preferenceName="currency" preferencesFilePath={preferencesFilePath}
-            setPreferenceVar={setCurrency}/>
-          <SettingsBox title="Offset de Columna" preferenceName="colOffset" preferencesFilePath={preferencesFilePath}
-            setPreferenceVar={setColOffset}/>
-          <SettingsBox title="Offset de Fila" preferenceName="rowOffset" preferencesFilePath={preferencesFilePath}
-            setPreferenceVar={setRowOffset}/>
+          <SettingsBox
+            title="Codi d'Idioma"
+            preferenceName="language"
+            preferencesFilePath={preferencesFilePath}
+            setPreferenceVar={setLanguage}
+          />
+          <SettingsBox
+            title="Símbol de Moneda"
+            preferenceName="currency"
+            preferencesFilePath={preferencesFilePath}
+            setPreferenceVar={setCurrency}
+          />
+          <SettingsBox
+            title="Offset de Columna"
+            preferenceName="colOffset"
+            preferencesFilePath={preferencesFilePath}
+            setPreferenceVar={setColOffset}
+          />
+          <SettingsBox
+            title="Offset de Fila"
+            preferenceName="rowOffset"
+            preferencesFilePath={preferencesFilePath}
+            setPreferenceVar={setRowOffset}
+          />
         </View>
       </View>
       <StatusBar style="dark" />
     </View>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#25292e',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#25292e",
+    alignItems: "center",
+    justifyContent: "center",
     paddingBottom: 25,
     gap: 12,
   },
   title: {
-    color: 'white',
+    color: "white",
     paddingTop: 2,
     fontSize: 27,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   topContainer: {
-    flexDirection: 'row-reverse',
-    justifyContent: 'flex-start',
-    alignItems: 'center',
+    flexDirection: "row-reverse",
+    justifyContent: "flex-start",
+    alignItems: "center",
     height: 60,
-    width: '100%',
-    position: 'absolute',
+    width: "100%",
+    position: "absolute",
     top: 60,
-    zIndex: -10,
   },
   settingsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    width: '100%',
-    paddingTop: '10%',
-    paddingLeft: '10%',
-    paddingRight: '10%',
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    width: "100%",
+    paddingTop: "10%",
+    paddingLeft: "10%",
+    paddingRight: "10%",
     rowGap: 20,
   },
   placeholder: {
