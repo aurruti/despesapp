@@ -36,5 +36,6 @@ yarn-error.*
 *.tsbuildinfo
 
 # others
+venv/
 .idea/
 *.db
