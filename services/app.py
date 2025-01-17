@@ -1,5 +1,6 @@
 import uvicorn
 from fastapi import FastAPI, Request, HTTPException, Depends
+from fastapi.responses import HTMLResponse
 from fastapi.security import OAuth2PasswordBearer
 from fastapi.middleware.cors import CORSMiddleware
 import aiosqlite
@@ -123,11 +124,31 @@ async def oauth_callback(request: Request, db: aiosqlite.Connection = Depends(ge
     ))
     await db.commit()
 
-    # Create and return session token...
+    if not code:
+        return HTMLResponse("""
+            <html>
+                <body style="display: flex; justify-content: center; align-items: center; height: 100vh; font-family: Arial;">
+                    <div style="text-align: center">
+                        <h2>Authentication Failed</h2>
+                        <p>Please close this window and try again.</p>
+                    </div>
+                </body>
+            </html>
+        """)
+        
     return {
-        "session_token": create_session_token(user_info),
-        "user_info": user_info
-    }
+        "session_token": session_token,
+        "user_info": user_info,
+        HTMLResponse("""
+        <html>
+            <body style="display: flex; justify-content: center; align-items: center; height: 100vh; font-family: Arial;">
+                <div style="text-align: center">
+                    <h2>Authentication Successful!</h2>
+                    <p>You can now close this window and return to the app.</p>
+                </div>
+            </body>
+        </html>
+    """)}
 
 @app.get("/api/me")
 async def get_current_user(session: UserSession = Depends(verify_session_token)):
