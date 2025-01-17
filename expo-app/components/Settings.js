@@ -1,5 +1,11 @@
 import { useEffect } from "react";
-import { BackHandler, Text, View, StyleSheet } from "react-native";
+import {
+  ToastAndroid,
+  BackHandler,
+  Text,
+  View,
+  StyleSheet,
+} from "react-native";
 import { StatusBar } from "expo-status-bar";
 
 import { loginGoogle, checkSession, logoutGoogle } from "../fun/googleFun.js";
