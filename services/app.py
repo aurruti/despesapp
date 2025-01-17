@@ -82,6 +82,7 @@ async def check_api():
 @app.get("/api/oauth/callback")
 async def oauth_callback(request: Request, db: aiosqlite.Connection = Depends(get_db)):
     # Get the authorization code from the query parameters
+    print(request.query_params)
     code = request.query_params.get("code")
     if not code:
         raise HTTPException(status_code=400, detail="No authorization code provided")
@@ -104,6 +105,7 @@ async def oauth_callback(request: Request, db: aiosqlite.Connection = Depends(ge
         )
 
     token_data = token_response.json()
+    print(token_response)
     if "error" in token_data:
         raise HTTPException(status_code=400, detail=token_data["error"])
 
