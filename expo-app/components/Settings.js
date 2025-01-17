@@ -38,6 +38,18 @@ export default function SettingsScreen({
     };
   }, [exitAction]);
 
+  async function checkSessionWithToast() {
+    const session_name = await checkSession();
+    if (session_name) {
+      ToastAndroid.show(
+        `Sessió activa per a: ${session_name}`,
+        ToastAndroid.SHORT
+      );
+    } else {
+      ToastAndroid.show("No hi ha cap sessió activa.", ToastAndroid.SHORT);
+    }
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.topContainer}>
@@ -60,7 +72,7 @@ export default function SettingsScreen({
         />
         <Button
           label="Comprova la sessió"
-          onPress={async () => await checkSession()}
+          onPress={async () => await checkSessionWithToast()}
         />
         <Button
           label="Tanca la sessió"

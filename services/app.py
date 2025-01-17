@@ -84,8 +84,8 @@ async def oauth_callback(request: Request, db: aiosqlite.Connection = Depends(ge
     # Get the authorization code from the query parameters
     code = request.query_params.get("code")
     if not code or code == None:
+        print("No authorization code provided")
         raise HTTPException(status_code=400, detail="No authorization code provided")
-    print("code" + str(code))
 
     # Prepare the token request data
     token_data = {
@@ -95,8 +95,6 @@ async def oauth_callback(request: Request, db: aiosqlite.Connection = Depends(ge
         "redirect_uri": "https://despesapp.naidd.duckdns.org/api/oauth/callback",
         "grant_type": "authorization_code",
     }
-    
-    print("token data" + str(token_data))
 
     # Exchange code for tokens
     async with httpx.AsyncClient() as client:
@@ -105,9 +103,7 @@ async def oauth_callback(request: Request, db: aiosqlite.Connection = Depends(ge
             data=token_data,
             headers={"Content-Type": "application/x-www-form-urlencoded"},
         )
-
     token_data = token_response.json()
-    print("token response" + str(token_response))
     if "error" in token_data:
         raise HTTPException(status_code=400, detail=token_data["error"])
 
@@ -127,7 +123,9 @@ async def oauth_callback(request: Request, db: aiosqlite.Connection = Depends(ge
         expires_at.isoformat()
     ))
     await db.commit()
-       
+
+    print("Successful authentication from user with email: " + user_info["email"])
+
     if "text/html" in request.headers.get("accept", ""):
         return HTMLResponse("""
             <html>
@@ -216,5 +214,4 @@ async def logout(
 
 
 if __name__ == "__main__":
-    print(JWT_SECRET)
     uvicorn.run(app, host="0.0.0.0", port=8000)

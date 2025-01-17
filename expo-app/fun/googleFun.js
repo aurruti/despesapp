@@ -58,6 +58,7 @@ export async function checkSession() {
 
     const data = await response.json();
     console.log(`Session active for: ${data.email}`);
+    return data.name;
   } catch (error) {
     console.error("Session check failed: " + error.message);
   }
