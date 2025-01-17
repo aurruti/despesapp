@@ -82,8 +82,8 @@ async def check_api():
 @app.get("/api/oauth/callback")
 async def oauth_callback(request: Request, db: aiosqlite.Connection = Depends(get_db)):
     # Get the authorization code from the query parameters
-    print(request.query_params)
     code = request.query_params.get("code")
+    print("code" + code)
     if not code:
         raise HTTPException(status_code=400, detail="No authorization code provided")
 
@@ -95,6 +95,8 @@ async def oauth_callback(request: Request, db: aiosqlite.Connection = Depends(ge
         "redirect_uri": "https://despesapp.naidd.duckdns.org/api/oauth/callback",
         "grant_type": "authorization_code",
     }
+    
+    print("token data" + token_data)
 
     # Exchange code for tokens
     async with httpx.AsyncClient() as client:
