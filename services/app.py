@@ -83,9 +83,9 @@ async def check_api():
 async def oauth_callback(request: Request, db: aiosqlite.Connection = Depends(get_db)):
     # Get the authorization code from the query parameters
     code = request.query_params.get("code")
-    print("code" + code)
-    if not code:
+    if not code or code == None:
         raise HTTPException(status_code=400, detail="No authorization code provided")
+    print("code" + str(code))
 
     # Prepare the token request data
     token_data = {
@@ -96,7 +96,7 @@ async def oauth_callback(request: Request, db: aiosqlite.Connection = Depends(ge
         "grant_type": "authorization_code",
     }
     
-    print("token data" + token_data)
+    print("token data" + str(token_data))
 
     # Exchange code for tokens
     async with httpx.AsyncClient() as client:
@@ -107,7 +107,7 @@ async def oauth_callback(request: Request, db: aiosqlite.Connection = Depends(ge
         )
 
     token_data = token_response.json()
-    print(token_response)
+    print("token response" + str(token_response))
     if "error" in token_data:
         raise HTTPException(status_code=400, detail=token_data["error"])
 
