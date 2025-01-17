@@ -9,7 +9,9 @@ export async function loginGoogle() {
       `client_id=${GOOGLE_CLIENT_ID}` +
       `&redirect_uri=${encodeURIComponent(`${API_URL}/api/oauth/callback`)}` +
       `&response_type=code` +
-      `&scope=${encodeURIComponent("email profile")}`;
+      `&scope=${encodeURIComponent("email profile")}` +
+      `&access_type=offline` +
+      "&prompt=consent";
 
     // Open browser for Google login
     const result = await WebBrowser.openAuthSessionAsync(
