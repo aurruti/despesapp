@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import aiosqlite
 import httpx
 from os import getenv as env
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import jwt
 
 from models import UserSession
@@ -36,7 +36,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 def create_session_token(user_info: dict) -> str:
     """Create a JWT session token"""
-    expiration = datetime.now(tz=datetime.timezone.utc) + timedelta(days=7)
+    expiration = datetime.now(tz=timezone.utc) + timedelta(days=7)
     payload = {
         "user_id": user_info["id"],
         "email": user_info["email"],
@@ -116,7 +116,7 @@ async def oauth_callback(request: Request, db: aiosqlite.Connection = Depends(ge
     session_token = create_session_token(user_info)
 
     # Store tokens in SQLite
-    expires_at = datetime.utcnow() + timedelta(seconds=token_data["expires_in"])
+    expires_at = datetime.now(tz=timezone.utc) + timedelta(seconds=token_data["expires_in"])
     await db.execute("""
         INSERT OR REPLACE INTO tokens (user_id, access_token, refresh_token, expires_at)
         VALUES (?, ?, ?, ?)
@@ -187,7 +187,7 @@ async def refresh_token(
         raise HTTPException(status_code=400, detail=new_token_data["error"])
 
     # Update stored tokens in database
-    expires_at = datetime.utcnow() + timedelta(seconds=new_token_data["expires_in"])
+    expires_at = datetime.now(tz=timezone.utc) + timedelta(seconds=new_token_data["expires_in"])
     await db.execute("""
         UPDATE tokens 
         SET access_token = ?, expires_at = ?
