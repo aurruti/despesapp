@@ -1,6 +1,6 @@
 import uvicorn
 from fastapi import FastAPI, Request, HTTPException, Depends
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.security import OAuth2PasswordBearer
 from fastapi.middleware.cors import CORSMiddleware
 import aiosqlite
@@ -77,7 +77,7 @@ async def startup_event():
 
 @app.get("/api/check")
 async def check_api():
-    return {"status": True}
+    return JSONResponse({"status": True})
 
 @app.get("/api/oauth/callback")
 async def oauth_callback(request: Request, db: aiosqlite.Connection = Depends(get_db)):
@@ -123,32 +123,23 @@ async def oauth_callback(request: Request, db: aiosqlite.Connection = Depends(ge
         expires_at.isoformat()
     ))
     await db.commit()
-
-    if not code:
+       
+    if "text/html" in request.headers.get("accept", ""):
         return HTMLResponse("""
             <html>
                 <body style="display: flex; justify-content: center; align-items: center; height: 100vh; font-family: Arial;">
                     <div style="text-align: center">
-                        <h2>Authentication Failed</h2>
-                        <p>Please close this window and try again.</p>
+                        <h2>Authentication Successful!</h2>
+                        <p>You can now close this window and return to the app.</p>
                     </div>
                 </body>
             </html>
         """)
-        
-    return {
-        "session_token": session_token,
-        "user_info": user_info,
-        HTMLResponse("""
-        <html>
-            <body style="display: flex; justify-content: center; align-items: center; height: 100vh; font-family: Arial;">
-                <div style="text-align: center">
-                    <h2>Authentication Successful!</h2>
-                    <p>You can now close this window and return to the app.</p>
-                </div>
-            </body>
-        </html>
-    """)}
+    else:
+        return JSONResponse({
+            "session_token": session_token,
+            "user_info": user_info
+        })
 
 @app.get("/api/me")
 async def get_current_user(session: UserSession = Depends(verify_session_token)):
@@ -204,7 +195,7 @@ async def refresh_token(
     ))
     await db.commit()
 
-    return {"status": "Token refreshed successfully"}
+    return JSONResponse({"status": "Token refreshed successfully"})
 
 @app.post("/api/logout")
 async def logout(
@@ -214,7 +205,7 @@ async def logout(
     """Logout user and invalidate tokens"""
     await db.execute("DELETE FROM tokens WHERE user_id = ?", (session.user_id,))
     await db.commit()
-    return {"status": "Logged out successfully"}
+    return JSONResponse({"status": "Logged out successfully"})
 
 
 
