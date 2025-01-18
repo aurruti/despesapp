@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import {
+  AppState,
   ToastAndroid,
   BackHandler,
   Text,
@@ -39,8 +40,14 @@ export default function SettingsScreen({
       "hardwareBackPress",
       handleBackButtonPress
     );
+
+    const subscription = AppState.addEventListener("change", (nextAppState) => {
+      console.log(`App state changed to: ${nextAppState}`);
+    });
+
     return () => {
       backHandler.remove();
+      subscription.remove();
     };
   }, [exitAction]);
 

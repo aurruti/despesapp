@@ -1,6 +1,7 @@
 import { API_URL, GOOGLE_CLIENT_ID } from "@env";
 import * as WebBrowser from "expo-web-browser";
 import * as SecureStore from "expo-secure-store";
+import { ToastAndroid } from "react-native";
 
 export async function loginGoogle() {
   try {
@@ -12,16 +13,19 @@ export async function loginGoogle() {
       `&scope=${encodeURIComponent("email profile")}` +
       `&access_type=offline` +
       "&prompt=consent";
-
+    const redirectUri = `${API_URL}/api/oauth/callback`;
+    console.log(redirectUri);
     // Open browser for Google login
     const result = await WebBrowser.openAuthSessionAsync(
       googleAuthUrl,
-      `${API_URL}/api/oauth/callback`
+      redirectUri
     );
+    WebBrowser.maybeCompleteAuthSession();
 
     console.log(result);
 
     if (result.type === "success") {
+      ToastAndroid.show("Check correct.", ToastAndroid.SHORT);
       // Extract the auth code from URL
       const url = new URL(result.url);
       const code = url.searchParams.get("code");
@@ -35,6 +39,12 @@ export async function loginGoogle() {
       // Store the session token
       await SecureStore.setItemAsync("sessionToken", data.session_token);
       console.log("Logged in successfully");
+    } else {
+      ToastAndroid.show(
+        "Error al iniciar sessió: " + result.type,
+        ToastAndroid.SHORT
+      );
+      console.warn("Login failed: " + result.type);
     }
   } catch (error) {
     console.error("Login failed: " + error.message);
@@ -77,10 +87,13 @@ export async function logoutGoogle() {
       });
       await SecureStore.deleteItemAsync("sessionToken");
       console.log("Logged out successfully");
+      ToastAndroid.show("S'ha tancat la sessió.", ToastAndroid.SHORT);
     } else {
       console.log("No session to logout");
+      ToastAndroid.show("No hi ha cap sessió per tancar.", ToastAndroid.SHORT);
     }
   } catch (error) {
+    ToastAndroid.show("Error al tancar la sessió.", ToastAndroid.SHORT);
     console.error("Logout failed: " + error.message);
   }
   return null;
