@@ -124,7 +124,7 @@ async def oauth_callback(request: Request, db: aiosqlite.Connection = Depends(ge
     ))
     await db.commit()
 
-    print(datetime.now(tz=timezone.utc) + ">> Successful authentication from user with email: " + user_info["email"])
+    print(str(datetime.now(tz=timezone.utc)) + ">> Successful authentication from user with email: " + user_info["email"])
 
     return JSONResponse({
         "session_token": session_token,
