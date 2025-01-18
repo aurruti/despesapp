@@ -1,10 +1,34 @@
 import { API_URL, GOOGLE_CLIENT_ID } from "@env";
 import * as WebBrowser from "expo-web-browser";
 import * as SecureStore from "expo-secure-store";
-import { ToastAndroid } from "react-native";
+import { ToastAndroid, Linking } from "react-native";
 
 export async function loginGoogle() {
+  async function handleDeepLink() {
+    Linking.addEventListener("url", async (event) => {
+      const url = event.url;
+      const queryParams = new URLSearchParams(new URL(url).search);
+      const sessionToken = queryParams.get("session_token");
+      const userInfo = queryParams.get("user_info");
+
+      if (sessionToken) {
+        await SecureStore.setItemAsync("sessionToken", sessionToken);
+        await SecureStore.setItemAsync("userInfo", userInfo);
+        console.log("Logged in successfully");
+        ToastAndroid.show("Sessió iniciada correctament.", ToastAndroid.SHORT);
+      } else {
+        console.warn("Login failed: No session token");
+        ToastAndroid.show(
+          "Error al iniciar sessió: No s'ha trobat el token de sessió.",
+          ToastAndroid.SHORT
+        );
+      }
+    });
+  }
+
   try {
+    handleDeepLink();
+
     const googleAuthUrl =
       `https://accounts.google.com/o/oauth2/v2/auth?` +
       `client_id=${GOOGLE_CLIENT_ID}` +
@@ -25,20 +49,8 @@ export async function loginGoogle() {
     console.log(result);
 
     if (result.type === "success") {
+      console.log("Check correct.");
       ToastAndroid.show("Check correct.", ToastAndroid.SHORT);
-      // Extract the auth code from URL
-      const url = new URL(result.url);
-      const code = url.searchParams.get("code");
-
-      // Get session token from backend
-      const response = await fetch(
-        `${API_URL}/api/oauth/callback?code=${code}`
-      );
-      const data = await response.json();
-
-      // Store the session token
-      await SecureStore.setItemAsync("sessionToken", data.session_token);
-      console.log("Logged in successfully");
     } else {
       ToastAndroid.show(
         "Error al iniciar sessió: " + result.type,

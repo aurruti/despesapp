@@ -1,6 +1,6 @@
 import uvicorn
 from fastapi import FastAPI, Request, HTTPException, Depends
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.security import OAuth2PasswordBearer
 from fastapi.middleware.cors import CORSMiddleware
 import aiosqlite
@@ -126,10 +126,8 @@ async def oauth_callback(request: Request, db: aiosqlite.Connection = Depends(ge
 
     print(str(datetime.now(tz=timezone.utc)) + ">> Successful authentication from user with email: " + user_info["email"])
 
-    return JSONResponse({
-        "session_token": session_token,
-        "user_info": user_info
-    })
+    redirect_uri = f"cat.aurruti.despesapp://app?session_token={session_token}&user_info={user_info}"
+    return RedirectResponse(url=redirect_uri)
 
 @app.get("/api/me")
 async def get_current_user(session: UserSession = Depends(verify_session_token)):
