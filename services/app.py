@@ -226,7 +226,7 @@ async def list_user_sheets(
         client_secret=env("GOOGLE_CLIENT_SECRET"),
         token_uri="https://oauth2.googleapis.com/token",
     )
-    service = build("sheets", "v3", credentials=credentials)
+    service = build("sheets", "v4", credentials=credentials)
 
     try: 
         results = service.files().list(
