@@ -36,6 +36,8 @@ export default function App() {
   const [spendAmount, setSpendAmount] = useState("");
   const [spendType, setSpendType] = useState("");
 
+  const [loggedIn, setLoggedIn] = useState(false);
+
   {
     /*INITIALIZATION */
   }
@@ -95,6 +97,8 @@ export default function App() {
           setRowOffset={setRowOffset}
           setColOffset={setColOffset}
           preferencesFilePath={preferencesFilePath}
+          loggedIn={loggedIn}
+          setLoggedIn={setLoggedIn}
         />
       ) : (
         <>

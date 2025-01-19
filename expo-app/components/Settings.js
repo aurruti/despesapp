@@ -23,8 +23,10 @@ export default function SettingsScreen({
   setRowOffset,
   setColOffset,
   preferencesFilePath,
+  loggedIn,
+  setLoggedIn,
 }) {
-  exitAction = () => {
+  const exitAction = () => {
     setShowAddType(false);
     setShowAddSpending(false);
     setShowAppOptions(false);
@@ -44,6 +46,17 @@ export default function SettingsScreen({
     const subscription = AppState.addEventListener("change", (nextAppState) => {
       console.log(`App state changed to: ${nextAppState}`);
     });
+
+    const checkLoggedIn = async () => {
+      const sessionCheck = await checkSession();
+      if (sessionCheck) {
+        setLoggedIn(true);
+      } else {
+        setLoggedIn(false);
+      }
+    };
+
+    checkLoggedIn();
 
     return () => {
       backHandler.remove();
@@ -79,19 +92,17 @@ export default function SettingsScreen({
         <Text style={styles.title}> Configuració </Text>
       </View>
       <View style={{ justifyContent: "center", alignItems: "center" }}>
-        <Button
-          label="Autentica't a Google"
-          onPress={async () => await loginGoogle()}
-        />
-        <Button
-          label="Comprova la sessió"
-          onPress={async () => await checkSessionWithToast()}
-        />
-        <Button
-          label="Tanca la sessió"
-          onPress={async () => await logoutGoogle()}
-        />
         <View style={styles.placeholder} />
+        <Button
+          theme="google"
+          label={loggedIn ? "Tanca la sessió" : "Autentica't a Google"}
+          onPress={
+            loggedIn
+              ? async () => await logoutGoogle()
+              : async () => await loginGoogle()
+          }
+        />
+
         <View style={styles.settingsContainer}>
           <SettingsBox
             title="Codi d'Idioma"
@@ -118,6 +129,12 @@ export default function SettingsScreen({
             setPreferenceVar={setRowOffset}
           />
         </View>
+        <View style={styles.placeholder} />
+        <Button
+          theme="session-check"
+          label="Comprova la sessió"
+          onPress={async () => await checkSessionWithToast()}
+        />
       </View>
       <StatusBar style="dark" />
     </View>
