@@ -8,6 +8,9 @@ import httpx
 from os import getenv as env
 from datetime import datetime, timedelta, timezone
 import jwt
+import json
+from google.oauth2.credentials import Credentials
+from googleapiclient.discovery import build
 
 from models import UserSession
 from db_handling import init_db, get_db
@@ -114,19 +117,20 @@ async def oauth_callback(request: Request, db: aiosqlite.Connection = Depends(ge
     # Store tokens in SQLite
     expires_at = datetime.now(tz=timezone.utc) + timedelta(seconds=token_data["expires_in"])
     await db.execute("""
-        INSERT OR REPLACE INTO tokens (user_id, access_token, refresh_token, expires_at)
-        VALUES (?, ?, ?, ?)
+        INSERT OR REPLACE INTO tokens (user_id, access_token, refresh_token, expires_at, scope)
+        VALUES (?, ?, ?, ?, ?)
     """, (
         user_info["id"],
         token_data["access_token"],
         token_data["refresh_token"],
-        expires_at.isoformat()
+        expires_at.isoformat(),
+        token_data["scope", ""]
     ))
     await db.commit()
 
     print(str(datetime.now(tz=timezone.utc)) + ">> Successful authentication from user with email: " + user_info["email"])
 
-    redirect_uri = f"cat.aurruti.despesapp://app?session_token={session_token}&user_info={user_info}"
+    redirect_uri = f"cat.aurruti.despesapp://app?session_token={session_token}&user_info={json.dumps(user_info)}"
     return RedirectResponse(url=redirect_uri)
 
 @app.get("/api/me")
@@ -199,6 +203,89 @@ async def logout(
     return JSONResponse({"status": "Logged out successfully"})
 
 
+# New endpoint to handle Google Sheets picker
+@app.get("/api/sheets/picker")
+async def sheets_picker(
+    session_token: str,
+    db: aiosqlite.Connection = Depends(get_db)
+):
+    user_info = verify_session_token(session_token)
+    if not user_info:
+        raise HTTPException(status_code=401, detail="Invalid session token")
+
+    # Get the user's tokens
+    async with db.execute(
+        "SELECT access_token, refresh_token FROM tokens WHERE user_id = ?",
+        (user_info["id"],)
+    ) as cursor:
+        token_data = await cursor.fetchone()
+        
+    if not token_data:
+        raise HTTPException(status_code=401, detail="No tokens found")
+
+    # Create Google Sheets API client
+    credentials = Credentials(
+        token=token_data[0],
+        refresh_token=token_data[1],
+        client_id=env("GOOGLE_CLIENT_ID"),
+        client_secret=env("GOOGLE_CLIENT_SECRET"),
+        token_uri="https://oauth2.googleapis.com/token",
+    )
+
+    service = build('drive', 'v3', credentials=credentials)
+    
+    # Generate picker HTML
+    html_content = """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Select Google Sheet</title>
+        <script src="https://apis.google.com/js/api.js"></script>
+        <script>
+            function loadPicker() {
+                gapi.load('picker', () => {
+                    const picker = new google.picker.PickerBuilder()
+                        .addView(google.picker.ViewId.SPREADSHEETS)
+                        .setOAuthToken('""" + token_data[0] + """')
+                        .setDeveloperKey('""" + env("GOOGLE_API_KEY") + """')
+                        .setCallback(pickerCallback)
+                        .build();
+                    picker.setVisible(true);
+                });
+            }
+
+            function pickerCallback(data) {
+                if (data.action === google.picker.Action.PICKED) {
+                    const fileId = data.docs[0].id;
+                    window.location.href = '/api/sheets/picker/callback?file_id=' + fileId;
+                }
+            }
+        </script>
+    </head>
+    <body onload="loadPicker()">
+        <div>Loading Google Sheets picker...</div>
+    </body>
+    </html>
+    """
+    
+    return HTMLResponse(content=html_content)
+
+
+# Callback endpoint for sheet selection
+@app.get("/api/sheets/picker/callback")
+async def sheets_picker_callback(
+    file_id: str,
+    db: aiosqlite.Connection = Depends(get_db)
+):
+    # Store the selected sheet ID
+    await db.execute("""
+        INSERT OR REPLACE INTO selected_sheets (file_id) VALUES (?)
+    """, (file_id,))
+    await db.commit()
+    
+    return RedirectResponse(
+        url=f"cat.aurruti.despesapp://app?sheets_authorized=true&file_id={file_id}"
+    )
 
 
 

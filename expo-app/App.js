@@ -11,6 +11,7 @@ import SettingsScreen from "./components/Settings";
 import MonthPicker from "./components/MonthPicker";
 import appStartup from "./fun/filestartup.js";
 import { checkLoggedIn, refreshToken } from "./fun/googleFun.js";
+import pickGoogleSheet from "./fun/googleSheets.js";
 
 const preferencesFilePath = `${FileSystem.documentDirectory}preferences.json`;
 const typelistFilePath = `${FileSystem.documentDirectory}typelist.json`;
@@ -168,12 +169,9 @@ export default function App() {
             <Button
               theme="spreadsheet"
               label={currentSheet}
-              onPress={() =>
-                Alert.alert(
-                  "No disponible",
-                  "L'opció de canviar de full de despeses encara no està implementada. Vindrà en properes actualizacions de l'app!"
-                )
-              }
+              onPress={async () => {
+                pickGoogleSheet();
+              }}
             />
             <Button
               theme="month"

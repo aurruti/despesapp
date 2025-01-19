@@ -4,12 +4,13 @@ import * as SecureStore from "expo-secure-store";
 import { ToastAndroid, Linking } from "react-native";
 
 export async function checkLoggedIn(setLoggedIn) {
-  const sessionCheck = await checkSession();
-  if (sessionCheck) {
+  const sessionName = await checkSession();
+  if (sessionName) {
     setLoggedIn(true);
   } else {
     setLoggedIn(false);
   }
+  return sessionName;
 }
 
 export async function refreshToken() {
@@ -39,29 +40,39 @@ export async function refreshToken() {
   }
 }
 
-export async function loginGoogle() {
-  async function handleDeepLink() {
-    Linking.addEventListener("url", async (event) => {
-      const url = event.url;
-      const queryParams = new URLSearchParams(new URL(url).search);
-      const sessionToken = queryParams.get("session_token");
-      const userInfo = queryParams.get("user_info");
+export async function handleDeepLink() {
+  Linking.addEventListener("url", async (event) => {
+    const url = event.url;
+    const queryParams = new URLSearchParams(new URL(url).search);
+    const sessionToken = queryParams.get("session_token");
+    const userInfo = queryParams.get("user_info");
+    const sheetsAuth = queryParams.get("sheets_authorized");
 
-      if (sessionToken) {
-        await SecureStore.setItemAsync("sessionToken", sessionToken);
-        await SecureStore.setItemAsync("userInfo", userInfo);
-        console.log("Logged in successfully");
-        ToastAndroid.show("Sessió iniciada correctament.", ToastAndroid.SHORT);
-      } else {
-        console.warn("Login failed: No session token");
+    if (sessionToken) {
+      await SecureStore.setItemAsync("sessionToken", sessionToken);
+      await SecureStore.setItemAsync("userInfo", userInfo);
+
+      if (sheetsAuth) {
+        console.log("Authorized sheets: " + sheetsAuth);
         ToastAndroid.show(
-          "Error al iniciar sessió: No s'ha trobat el token de sessió.",
+          "S'ha autoritzat l'accés a Google Sheets.",
           ToastAndroid.SHORT
         );
+      } else {
+        console.log("Logged in successfully");
+        ToastAndroid.show("Sessió iniciada correctament.", ToastAndroid.SHORT);
       }
-    });
-  }
+    } else {
+      console.warn("Login failed: No session token");
+      ToastAndroid.show(
+        "Error al iniciar sessió: No s'ha trobat el token de sessió.",
+        ToastAndroid.SHORT
+      );
+    }
+  });
+}
 
+export async function loginGoogle() {
   try {
     handleDeepLink();
 
@@ -70,7 +81,9 @@ export async function loginGoogle() {
       `client_id=${GOOGLE_CLIENT_ID}` +
       `&redirect_uri=${encodeURIComponent(`${API_URL}/api/oauth/callback`)}` +
       `&response_type=code` +
-      `&scope=${encodeURIComponent("email profile")}` +
+      `&scope=${encodeURIComponent(
+        "email profile https://www.googleapis.com/auth/drive.file"
+      )}` +
       `&access_type=offline` +
       "&prompt=consent";
     const redirectUri = `${API_URL}/api/oauth/callback`;
