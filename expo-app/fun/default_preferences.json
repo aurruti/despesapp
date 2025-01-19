@@ -1,7 +1,7 @@
 {
-  "language" : "cat",
-  "currency" : "€",
-  "lastSheet" : "default",
+  "language": "cat",
+  "currency": "€",
+  "lastSheet": "none",
   "colOffset": 1,
   "rowOffset": 0
 }

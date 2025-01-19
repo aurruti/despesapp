@@ -148,7 +148,10 @@ export default function App() {
             />
           ) : showFilePicker ? (
             <View>
-              <GoogleSheetPicker />
+              <GoogleSheetPicker
+                currentSheet={currentSheet}
+                setCurrentSheet={setCurrentSheet}
+              />
             </View>
           ) : showMonthPicker && !showAppOptions ? (
             <MonthPicker

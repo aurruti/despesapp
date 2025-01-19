@@ -1,33 +1,96 @@
-import { React, useEffect, useState } from "react";
-import { StyleSheet, View, Text } from "react-native";
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  FlatList,
+  Pressable,
+  StyleSheet,
+} from "react-native";
 
-import { listGoogleSheets } from "../fun/googleSheets";
+import { loadSavedSheets, addNewSheet } from "../fun/googleSheets";
 
-export default function GoogleSheetPicker() {
-  const [spreadsheets, setSpreadsheets] = useState([]);
-  const [loading, setLoading] = useState(true);
+export default function GoogleSheetPicker(currentSheet, setCurrentSheet) {
+  const [sheets, setSheets] = useState([]);
+  const [newSheetUrl, setNewSheetUrl] = useState("");
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    const fetchData = async () => {
-      await listGoogleSheets(setSpreadsheets, setLoading);
-      console.log(spreadsheets);
-    };
-    fetchData();
-  }, [listGoogleSheets, spreadsheets, setSpreadsheets, loading, setLoading]);
+    loadSavedSheets(setSheets);
+  }, []);
 
   return (
     <View style={styles.container}>
-      loading? <Text>Loading...</Text> : <Text>Done!</Text>
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.input}
+          value={newSheetUrl}
+          onChangeText={setNewSheetUrl}
+          placeholder="Enter Google Sheet URL or ID"
+        />
+        <Pressable
+          style={styles.button}
+          onPress={() =>
+            addNewSheet(
+              newSheetUrl,
+              setNewSheetUrl,
+              sheets,
+              setSheets,
+              setError
+            )
+          }
+        >
+          <Text style={styles.buttonText}>Add</Text>
+        </Pressable>
+      </View>
+
+      {error ? <Text style={styles.error}>{error}</Text> : null}
+
+      <FlatList
+        data={sheets}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <View style={styles.sheetItem}>
+            <Text>{item.name}</Text>
+          </View>
+        )}
+      />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: "#fff",
+    padding: 16,
   },
-  webview: {
+  inputContainer: {
+    flexDirection: "row",
+    marginBottom: 16,
+  },
+  input: {
     flex: 1,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 4,
+    padding: 8,
+    marginRight: 8,
+  },
+  button: {
+    backgroundColor: "#007AFF",
+    padding: 8,
+    borderRadius: 4,
+    justifyContent: "center",
+  },
+  buttonText: {
+    color: "white",
+  },
+  sheetItem: {
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc",
+  },
+  error: {
+    color: "red",
+    marginBottom: 16,
   },
 });
