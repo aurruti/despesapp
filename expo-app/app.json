@@ -25,7 +25,21 @@
         "foregroundImage": "./assets/images/placeholder.png",
         "backgroundColor": "#FFFFFF"
       },
-      "package": "cat.aurruti.despesapp"
+      "package": "cat.aurruti.despesapp",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "data": [
+            {
+              "scheme": "https",
+              "host": "despesapp.naidd.duckdns.org",
+              "pathPrefix": "/callback",
+              "pathPattern": ".*"
+            }
+          ],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ]
     },
     "web": {
       "favicon": "./assets/images/placeholder.png"

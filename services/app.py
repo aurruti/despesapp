@@ -214,6 +214,10 @@ async def sheets_picker(
         (session.user_id,)
     ) as cursor:
         token_data = await cursor.fetchone()
+        if not token_data:
+            raise HTTPException(status_code=401, detail="No tokens found")
+        print("Token data:", token_data)
+
         
     if not token_data:
         raise HTTPException(status_code=401, detail="No tokens found")
@@ -238,22 +242,20 @@ async def sheets_picker(
         <script src="https://apis.google.com/js/api.js"></script>
         <script>
             function loadPicker() {
-                gapi.load('picker', () => {
-                    const picker = new google.picker.PickerBuilder()
-                        .addView(google.picker.ViewId.SPREADSHEETS)
-                        .setOAuthToken('""" + token_data[0] + """')
-                        .setDeveloperKey('""" + env("GOOGLE_API_KEY") + """')
-                        .setCallback(pickerCallback)
-                        .build();
-                    picker.setVisible(true);
+                gapi.load("picker", () => {
+                    try {
+                        const picker = new google.picker.PickerBuilder()
+                            .addView(google.picker.ViewId.SPREADSHEETS)
+                            .setOAuthToken("{{access_token}}")
+                            .setDeveloperKey("{{developer_key}}")
+                            .setCallback(pickerCallback)
+                            .build();
+                        picker.setVisible(true);
+                    } catch (err) {
+                        console.error("Error initializing Google Picker:", err);
+                        document.body.innerHTML = "<div>Error loading picker</div>";
+                    }
                 });
-            }
-
-            function pickerCallback(data) {
-                if (data.action === google.picker.Action.PICKED) {
-                    const fileId = data.docs[0].id;
-                    window.location.href = '/api/sheets/picker/callback?file_id=' + fileId;
-                }
             }
         </script>
     </head>

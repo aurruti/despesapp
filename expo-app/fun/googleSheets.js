@@ -13,11 +13,25 @@ export async function pickGoogleSheet() {
       throw new Error("No session token found. Please log in first.");
     }
 
-    const pickerUrl = `${API_URL}/api/sheets/picker?session_token=${sessionToken}`;
+    const headers = {
+      Authorization: `Bearer ${sessionToken}`,
+    };
+
+    const pickerUrl = `${API_URL}/api/sheets/picker`;
+
     console.log("Picker URL:", pickerUrl);
-    await WebBrowser.openAuthSessionAsync(
-      pickerUrl,
-      `${API_URL}/api/sheets/picker/callback`
+
+    const response = await fetch(pickerUrl, { headers });
+    const htmlContent = await response.text();
+
+    if (!response.ok) {
+      throw new Error(
+        `Failed to load Google Sheets picker: ${response.statusText}`
+      );
+    }
+
+    await WebBrowser.openBrowserAsync(
+      `data:text/html,${encodeURIComponent(htmlContent)}`
     );
 
     WebBrowser.maybeCompleteAuthSession();
