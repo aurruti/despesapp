@@ -27,7 +27,8 @@
     "react-native-dotenv": "^3.4.11",
     "react-native-paper": "4.9.2",
     "react-native-web": "~0.19.13",
-    "web": "^0.0.2"
+    "web": "^0.0.2",
+    "expo-dev-client": "~5.0.9"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

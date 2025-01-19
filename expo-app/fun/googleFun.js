@@ -45,19 +45,6 @@ export async function loginGoogle() {
       redirectUri
     );
     WebBrowser.maybeCompleteAuthSession();
-
-    console.log(result);
-
-    if (result.type === "success") {
-      console.log("Check correct.");
-      ToastAndroid.show("Check correct.", ToastAndroid.SHORT);
-    } else {
-      ToastAndroid.show(
-        "Error al iniciar sessió: " + result.type,
-        ToastAndroid.SHORT
-      );
-      console.warn("Login failed: " + result.type);
-    }
   } catch (error) {
     console.error("Login failed: " + error.message);
   }
@@ -84,7 +71,7 @@ export async function checkSession() {
   } catch (error) {
     console.error("Session check failed: " + error.message);
   }
-  return null;
+  return data.name;
 }
 
 export async function logoutGoogle() {

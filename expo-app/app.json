@@ -13,10 +13,9 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "scheme": "cat.aurruti.despesapp",
+    "platforms": ["ios", "android"],
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "cat.aurruti.despesapp"
@@ -37,9 +36,6 @@
       }
     },
     "owner": "aurruti",
-    "plugins": [
-      "expo-secure-store",
-      "expo-asset"
-    ]
+    "plugins": ["expo-secure-store", "expo-asset"]
   }
 }
