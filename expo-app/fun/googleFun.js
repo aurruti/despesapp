@@ -82,7 +82,7 @@ export async function loginGoogle() {
       `&redirect_uri=${encodeURIComponent(`${API_URL}/api/oauth/callback`)}` +
       `&response_type=code` +
       `&scope=${encodeURIComponent(
-        "email profile https://www.googleapis.com/auth/drive.file"
+        "email profile https://www.googleapis.com/auth/spreadsheets"
       )}` +
       `&access_type=offline` +
       "&prompt=consent";

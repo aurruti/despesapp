@@ -202,27 +202,21 @@ async def logout(
     return JSONResponse({"status": "Logged out successfully"})
 
 
-# New endpoint to handle Google Sheets picker
-@app.get("/api/sheets/picker")
-async def sheets_picker(
+@app.get("/api/sheets/list")
+async def list_user_sheets(
     session: UserSession = Depends(verify_session_token),
     db: aiosqlite.Connection = Depends(get_db)
 ):
-    # Get the user's tokens
+    """List all the user's Google Sheets"""
     async with db.execute(
-        "SELECT access_token, refresh_token FROM tokens WHERE user_id = ?",
+        "SELECT access_token FROM tokens WHERE user_id = ?",
         (session.user_id,)
     ) as cursor:
         token_data = await cursor.fetchone()
-        if not token_data:
-            raise HTTPException(status_code=401, detail="No tokens found")
-        print("Token data:", token_data)
-
-        
+    
     if not token_data:
-        raise HTTPException(status_code=401, detail="No tokens found")
+        raise HTTPException(status_code=401, detail="No access token found")
 
-    # Create Google Sheets API client
     credentials = Credentials(
         token=token_data[0],
         refresh_token=token_data[1],
@@ -230,59 +224,17 @@ async def sheets_picker(
         client_secret=env("GOOGLE_CLIENT_SECRET"),
         token_uri="https://oauth2.googleapis.com/token",
     )
+    service = build("sheets", "v3", credentials=credentials)
 
-    service = build('drive', 'v3', credentials=credentials)
-    
-    # Generate picker HTML
-    html_content = """
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>Select Google Sheet</title>
-        <script src="https://apis.google.com/js/api.js"></script>
-        <script>
-            function loadPicker() {
-                gapi.load("picker", () => {
-                    try {
-                        const picker = new google.picker.PickerBuilder()
-                            .addView(google.picker.ViewId.SPREADSHEETS)
-                            .setOAuthToken("{{access_token}}")
-                            .setDeveloperKey("{{developer_key}}")
-                            .setCallback(pickerCallback)
-                            .build();
-                        picker.setVisible(true);
-                    } catch (err) {
-                        console.error("Error initializing Google Picker:", err);
-                        document.body.innerHTML = "<div>Error loading picker</div>";
-                    }
-                });
-            }
-        </script>
-    </head>
-    <body onload="loadPicker()">
-        <div>Loading Google Sheets picker...</div>
-    </body>
-    </html>
-    """
-    
-    return HTMLResponse(content=html_content)
-
-
-# Callback endpoint for sheet selection
-@app.get("/api/sheets/picker/callback")
-async def sheets_picker_callback(
-    file_id: str,
-    db: aiosqlite.Connection = Depends(get_db)
-):
-    # Store the selected sheet ID
-    await db.execute("""
-        INSERT OR REPLACE INTO selected_sheets (file_id) VALUES (?)
-    """, (file_id,))
-    await db.commit()
-    
-    return RedirectResponse(
-        url=f"cat.aurruti.despesapp://app?sheets_authorized=true&file_id={file_id}"
-    )
+    try: 
+        results = service.files().list(
+            q="mimeType='application/vnd.google-apps.spreadsheet'",
+            fields="files(id, name)"
+        ).execute()
+        spreadsheets = results.get("files", [])
+        return JSONResponse({"spreadsheets": spreadsheets})
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch spreadsheets: {e}")
 
 
 

@@ -2,10 +2,8 @@ import { API_URL } from "@env";
 import * as SecureStore from "expo-secure-store";
 import { ToastAndroid } from "react-native";
 
-export async function pickGoogleSheet(setHtmlContent) {
+export async function listGoogleSheets(setSpreadsheets, setLoading) {
   try {
-    console.log("Picking Google Sheet...");
-
     const sessionToken = await SecureStore.getItemAsync("sessionToken");
     if (!sessionToken) {
       throw new Error("No session token found. Please log in first.");
@@ -15,20 +13,18 @@ export async function pickGoogleSheet(setHtmlContent) {
       Authorization: `Bearer ${sessionToken}`,
     };
 
-    const pickerUrl = `${API_URL}/api/sheets/picker`;
-    const response = await fetch(pickerUrl, { headers });
-    const htmlContent = await response.text();
+    const response = await fetch(`${API_URL}/api/sheets/list`, { headers });
+    const result = await response.json();
 
-    if (!response.ok) {
-      throw new Error(
-        `Failed to load Google Sheets picker: ${response.statusText}`
-      );
+    if (response.ok && result.spreadsheets) {
+      setSpreadsheets(result.spreadsheets);
+    } else {
+      throw new Error(result.detail || "Failed to fetch spreadsheets.");
     }
-
-    // Pass the HTML content to a state or handler function
-    setHtmlContent(htmlContent);
   } catch (error) {
-    console.error("Failed to pick Google Sheet:", error);
-    ToastAndroid.show("Error selecting Google Sheet", ToastAndroid.SHORT);
+    console.error("Error fetching spreadsheets:", error);
+    ToastAndroid.show("Error loading spreadsheets.", ToastAndroid.SHORT);
+  } finally {
+    setLoading(false);
   }
 }

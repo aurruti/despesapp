@@ -1,26 +1,23 @@
 import { React, useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
-import { WebView } from "react-native-webview";
 
-import { pickGoogleSheet } from "../fun/googleSheets";
+import { listGoogleSheets } from "../fun/googleSheets";
 
 export default function GoogleSheetPicker() {
-  const { htmlContent, setHtmlContent } = useState("");
+  const [spreadsheets, setSpreadsheets] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
-      await pickGoogleSheet(setHtmlContent);
+      await listGoogleSheets(setSpreadsheets, setLoading);
+      console.log(spreadsheets);
     };
     fetchData();
-  }, [pickGoogleSheet, setHtmlContent]);
+  }, [listGoogleSheets, spreadsheets, setSpreadsheets, loading, setLoading]);
 
   return (
     <View style={styles.container}>
-      <WebView
-        originWhitelist={["*"]}
-        source={{ html: htmlContent }}
-        style={styles.webview}
-      />
+      loading? <Text>Loading...</Text> : <Text>Done!</Text>
     </View>
   );
 }
