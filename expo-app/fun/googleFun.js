@@ -32,8 +32,8 @@ export async function refreshToken() {
     }
 
     const data = await response.json();
-    await SecureStore.setItemAsync("sessionToken", data.newSessionToken);
-    console.log("Token refreshed successfully");
+    await SecureStore.setItemAsync("sessionToken", data.token);
+    console.log(data.status + ".");
   } catch (error) {
     console.error("Token refresh failed: " + error.message);
   }

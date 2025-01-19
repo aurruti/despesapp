@@ -61,7 +61,7 @@ export default function SettingsScreen({
   }, [exitAction]);
 
   async function checkSessionWithToast() {
-    const session_name = await checkSession();
+    const session_name = await checkLoggedIn(setLoggedIn);
     if (session_name) {
       ToastAndroid.show(`Sessió activa: ${session_name}`, ToastAndroid.SHORT);
     } else {
@@ -93,11 +93,11 @@ export default function SettingsScreen({
             loggedIn
               ? async () => {
                   await logoutGoogle();
-                  await checkLoggedIn();
+                  await checkLoggedIn(setLoggedIn);
                 }
               : async () => {
                   await loginGoogle();
-                  await checkLoggedIn();
+                  await checkLoggedIn(setLoggedIn);
                 }
           }
         />

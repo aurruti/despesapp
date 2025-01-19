@@ -84,7 +84,7 @@ export default function App() {
 
     Startup();
     TokenRefreshWrap();
-  }, []);
+  }, [setLoggedIn]);
 
   const triggerAddSpend = async () => {
     ToastAndroid.show(
