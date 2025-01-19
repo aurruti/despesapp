@@ -232,7 +232,9 @@ async def list_user_sheets(
 
     try: 
         print(">> SERVICE: " + str(service))
-        results = service.files().list(
+        sheets = service.spreadsheets()
+        print(">> SHEETS: " + str(sheets))
+        results = sheets.list(
             q="mimeType='application/vnd.google-apps.spreadsheet'",
             fields="files(id, name)"
         ).execute()
