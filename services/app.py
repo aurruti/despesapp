@@ -205,17 +205,13 @@ async def logout(
 # New endpoint to handle Google Sheets picker
 @app.get("/api/sheets/picker")
 async def sheets_picker(
-    session_token: str,
+    session: UserSession = Depends(verify_session_token),
     db: aiosqlite.Connection = Depends(get_db)
 ):
-    user_info = await verify_session_token(session_token)
-    if not user_info:
-        raise HTTPException(status_code=401, detail="Invalid session token")
-
     # Get the user's tokens
     async with db.execute(
         "SELECT access_token, refresh_token FROM tokens WHERE user_id = ?",
-        (user_info.user_id,)
+        (session.user_id,)
     ) as cursor:
         token_data = await cursor.fetchone()
         
