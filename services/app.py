@@ -226,13 +226,17 @@ async def list_user_sheets(
         client_secret=env("GOOGLE_CLIENT_SECRET"),
         token_uri="https://oauth2.googleapis.com/token",
     )
+
+    print(">> CREDENTIALS " + str(credentials))
     service = build("sheets", "v4", credentials=credentials)
 
     try: 
+        print(">> SERVICE: " + str(service))
         results = service.files().list(
             q="mimeType='application/vnd.google-apps.spreadsheet'",
             fields="files(id, name)"
         ).execute()
+        print(">> RESULTS: " + str(results))
         spreadsheets = results.get("files", [])
         return JSONResponse({"spreadsheets": spreadsheets})
     except Exception as e:
