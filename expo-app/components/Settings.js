@@ -9,7 +9,12 @@ import {
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 
-import { loginGoogle, checkSession, logoutGoogle } from "../fun/googleFun.js";
+import {
+  loginGoogle,
+  checkLoggedIn,
+  checkSession,
+  logoutGoogle,
+} from "../fun/googleFun.js";
 import Button from "./Button";
 import CircleButton from "./CircleButton";
 import SettingsBox from "./SettingsBox";
@@ -47,16 +52,7 @@ export default function SettingsScreen({
       console.log(`App state changed to: ${nextAppState}`);
     });
 
-    const checkLoggedIn = async () => {
-      const sessionCheck = await checkSession();
-      if (sessionCheck) {
-        setLoggedIn(true);
-      } else {
-        setLoggedIn(false);
-      }
-    };
-
-    checkLoggedIn();
+    checkLoggedIn(setLoggedIn);
 
     return () => {
       backHandler.remove();
@@ -67,10 +63,7 @@ export default function SettingsScreen({
   async function checkSessionWithToast() {
     const session_name = await checkSession();
     if (session_name) {
-      ToastAndroid.show(
-        `Sessió activa per a: ${session_name}`,
-        ToastAndroid.SHORT
-      );
+      ToastAndroid.show(`Sessió activa: ${session_name}`, ToastAndroid.SHORT);
     } else {
       ToastAndroid.show("No hi ha cap sessió activa.", ToastAndroid.SHORT);
     }
@@ -98,8 +91,14 @@ export default function SettingsScreen({
           label={loggedIn ? "Tanca la sessió" : "Autentica't a Google"}
           onPress={
             loggedIn
-              ? async () => await logoutGoogle()
-              : async () => await loginGoogle()
+              ? async () => {
+                  await logoutGoogle();
+                  await checkLoggedIn();
+                }
+              : async () => {
+                  await loginGoogle();
+                  await checkLoggedIn();
+                }
           }
         />
 

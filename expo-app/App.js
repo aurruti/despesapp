@@ -10,6 +10,7 @@ import AddTypeBox from "./components/AddTypeBox";
 import SettingsScreen from "./components/Settings";
 import MonthPicker from "./components/MonthPicker";
 import appStartup from "./fun/filestartup.js";
+import { checkLoggedIn, refreshToken } from "./fun/googleFun.js";
 
 const preferencesFilePath = `${FileSystem.documentDirectory}preferences.json`;
 const typelistFilePath = `${FileSystem.documentDirectory}typelist.json`;
@@ -74,7 +75,15 @@ export default function App() {
       }
     };
 
+    const TokenRefreshWrap = async () => {
+      await checkLoggedIn(setLoggedIn);
+      if (loggedIn) {
+        await refreshToken();
+      }
+    };
+
     Startup();
+    TokenRefreshWrap();
   }, []);
 
   const triggerAddSpend = async () => {

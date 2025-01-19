@@ -182,8 +182,10 @@ async def refresh_token(
         session.user_id
     ))
     await db.commit()
+    refreshed_token = create_session_token({"id": session.user_id, "email": session.email})
+    print(str(datetime.now(tz=timezone.utc)) + ">> Successful token refresh for user with email: " + session.email)
 
-    return JSONResponse({"status": "Token refreshed successfully"})
+    return JSONResponse({"status": "Token refreshed successfully", "token": refreshed_token})
 
 @app.post("/api/logout")
 async def logout(
@@ -193,6 +195,7 @@ async def logout(
     """Logout user and invalidate tokens"""
     await db.execute("DELETE FROM tokens WHERE user_id = ?", (session.user_id,))
     await db.commit()
+    print(str(datetime.now(tz=timezone.utc)) + ">> Successful logout from user with email: " + session.email)
     return JSONResponse({"status": "Logged out successfully"})
 
 

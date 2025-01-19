@@ -3,6 +3,42 @@ import * as WebBrowser from "expo-web-browser";
 import * as SecureStore from "expo-secure-store";
 import { ToastAndroid, Linking } from "react-native";
 
+export async function checkLoggedIn(setLoggedIn) {
+  const sessionCheck = await checkSession();
+  if (sessionCheck) {
+    setLoggedIn(true);
+  } else {
+    setLoggedIn(false);
+  }
+}
+
+export async function refreshToken() {
+  try {
+    const sessionToken = await SecureStore.getItemAsync("sessionToken");
+    if (!sessionToken) {
+      console.warn("No session token found");
+      return;
+    }
+
+    const response = await fetch(`${API_URL}/api/refresh`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${sessionToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to refresh token");
+    }
+
+    const data = await response.json();
+    await SecureStore.setItemAsync("sessionToken", data.newSessionToken);
+    console.log("Token refreshed successfully");
+  } catch (error) {
+    console.error("Token refresh failed: " + error.message);
+  }
+}
+
 export async function loginGoogle() {
   async function handleDeepLink() {
     Linking.addEventListener("url", async (event) => {
@@ -66,12 +102,16 @@ export async function checkSession() {
     });
 
     const data = await response.json();
-    console.log(`Session active for: ${data.email}`);
-    return data.name;
+    console.log(`Session active for: ${data.email}. Expires: ${data.exp}`);
+
+    let sessionName = await SecureStore.getItemAsync("userInfo");
+    sessionName = sessionName.replace(/'/g, '"').replace(/True/g, "true");
+    const name = JSON.parse(sessionName).name;
+    return name;
   } catch (error) {
     console.error("Session check failed: " + error.message);
   }
-  return data.name;
+  return null;
 }
 
 export async function logoutGoogle() {
