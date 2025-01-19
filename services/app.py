@@ -208,15 +208,17 @@ async def list_user_sheets(
     db: aiosqlite.Connection = Depends(get_db)
 ):
     """List all the user's Google Sheets"""
+    # Get the user's tokens
     async with db.execute(
-        "SELECT access_token FROM tokens WHERE user_id = ?",
+        "SELECT access_token, refresh_token FROM tokens WHERE user_id = ?",
         (session.user_id,)
     ) as cursor:
         token_data = await cursor.fetchone()
-    
+        
     if not token_data:
-        raise HTTPException(status_code=401, detail="No access token found")
+        raise HTTPException(status_code=401, detail="No tokens found")
 
+    # Create Google Sheets API client
     credentials = Credentials(
         token=token_data[0],
         refresh_token=token_data[1],

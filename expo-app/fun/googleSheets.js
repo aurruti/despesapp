@@ -14,12 +14,13 @@ export async function listGoogleSheets(setSpreadsheets, setLoading) {
     };
 
     const response = await fetch(`${API_URL}/api/sheets/list`, { headers });
-    const result = await response.json();
 
-    if (response.ok && result.spreadsheets) {
+    if (response.ok) {
+      console.log(response);
+      const result = await response.json();
       setSpreadsheets(result.spreadsheets);
     } else {
-      throw new Error(result.detail || "Failed to fetch spreadsheets.");
+      throw new Error(response.status || "Failed to fetch spreadsheets.");
     }
   } catch (error) {
     console.error("Error fetching spreadsheets:", error);
