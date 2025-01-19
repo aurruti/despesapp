@@ -208,7 +208,7 @@ async def sheets_picker(
     session_token: str,
     db: aiosqlite.Connection = Depends(get_db)
 ):
-    user_info = verify_session_token(session_token)
+    user_info = await verify_session_token(session_token)
     if not user_info:
         raise HTTPException(status_code=401, detail="Invalid session token")
 
