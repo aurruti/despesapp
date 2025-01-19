@@ -1,12 +1,10 @@
 import { API_URL } from "@env";
-import * as WebBrowser from "expo-web-browser";
 import * as SecureStore from "expo-secure-store";
+import { ToastAndroid } from "react-native";
 
-import { handleDeepLink } from "./googleFun";
-
-export async function pickGoogleSheet() {
+export async function pickGoogleSheet(setHtmlContent) {
   try {
-    handleDeepLink();
+    console.log("Picking Google Sheet...");
 
     const sessionToken = await SecureStore.getItemAsync("sessionToken");
     if (!sessionToken) {
@@ -18,9 +16,6 @@ export async function pickGoogleSheet() {
     };
 
     const pickerUrl = `${API_URL}/api/sheets/picker`;
-
-    console.log("Picker URL:", pickerUrl);
-
     const response = await fetch(pickerUrl, { headers });
     const htmlContent = await response.text();
 
@@ -30,11 +25,8 @@ export async function pickGoogleSheet() {
       );
     }
 
-    await WebBrowser.openBrowserAsync(
-      `data:text/html,${encodeURIComponent(htmlContent)}`
-    );
-
-    WebBrowser.maybeCompleteAuthSession();
+    // Pass the HTML content to a state or handler function
+    setHtmlContent(htmlContent);
   } catch (error) {
     console.error("Failed to pick Google Sheet:", error);
     ToastAndroid.show("Error selecting Google Sheet", ToastAndroid.SHORT);

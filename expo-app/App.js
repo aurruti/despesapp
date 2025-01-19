@@ -11,7 +11,7 @@ import SettingsScreen from "./components/Settings";
 import MonthPicker from "./components/MonthPicker";
 import appStartup from "./fun/filestartup.js";
 import { checkLoggedIn, refreshToken } from "./fun/googleFun";
-import { pickGoogleSheet } from "./fun/googleSheets";
+import GoogleSheetPicker from "./components/GoogleSheetPicker.js";
 
 const preferencesFilePath = `${FileSystem.documentDirectory}preferences.json`;
 const typelistFilePath = `${FileSystem.documentDirectory}typelist.json`;
@@ -146,6 +146,10 @@ export default function App() {
               addTypeAction={() => setShowAddType(true)}
               exitAction={() => setShowAddSpending(false)}
             />
+          ) : showFilePicker ? (
+            <View>
+              <GoogleSheetPicker />
+            </View>
           ) : showMonthPicker && !showAppOptions ? (
             <MonthPicker
               monthYearFilePath={monthYearFilePath}
@@ -169,8 +173,11 @@ export default function App() {
             <Button
               theme="spreadsheet"
               label={currentSheet}
-              onPress={async () => {
-                await pickGoogleSheet();
+              onPress={() => {
+                setShowMonthPicker(false);
+                setShowAddType(false);
+                setShowFilePicker(!showFilePicker);
+                setShowAddSpending(false);
               }}
             />
             <Button
