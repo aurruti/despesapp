@@ -226,22 +226,28 @@ async def list_user_sheets(
         client_secret=env("GOOGLE_CLIENT_SECRET"),
         token_uri="https://oauth2.googleapis.com/token",
     )
+    try:
+        # Initialize the Drive API service with the required scope
+        service = build("drive", "v3", credentials=credentials)
 
-    print(">> CREDENTIALS " + str(credentials))
-    service = build("sheets", "v4", credentials=credentials)
-
-    try: 
-        print(">> SERVICE: " + str(service))
-        sheets = service.spreadsheets()
-        print(">> SHEETS: " + str(sheets))
-        results = sheets.list(
+        # Query for Google Sheets files
+        results = service.files().list(
             q="mimeType='application/vnd.google-apps.spreadsheet'",
             fields="files(id, name)"
         ).execute()
-        print(">> RESULTS: " + str(results))
+
+        print(">> Results:", results)
+        # Extract and return the list of spreadsheets
         spreadsheets = results.get("files", [])
+        if not spreadsheets:
+            return JSONResponse({"message": "No spreadsheets found."})
+        
+        print(">> Found spreadsheets:", spreadsheets)
+        print(str(datetime.now(tz=timezone.utc)) + ">> Successful fetch of spreadsheets for user with email: " + session.email)
         return JSONResponse({"spreadsheets": spreadsheets})
+
     except Exception as e:
+        print(">> ERROR:", str(e))
         raise HTTPException(status_code=500, detail=f"Failed to fetch spreadsheets: {e}")
 
 
