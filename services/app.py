@@ -117,14 +117,13 @@ async def oauth_callback(request: Request, db: aiosqlite.Connection = Depends(ge
     # Store tokens in SQLite
     expires_at = datetime.now(tz=timezone.utc) + timedelta(seconds=token_data["expires_in"])
     await db.execute("""
-        INSERT OR REPLACE INTO tokens (user_id, access_token, refresh_token, expires_at, scope)
-        VALUES (?, ?, ?, ?, ?)
+        INSERT OR REPLACE INTO tokens (user_id, access_token, refresh_token, expires_at)
+        VALUES (?, ?, ?, ?)
     """, (
         user_info["id"],
         token_data["access_token"],
         token_data["refresh_token"],
-        expires_at.isoformat(),
-        token_data["scope", ""]
+        expires_at.isoformat()
     ))
     await db.commit()
 
