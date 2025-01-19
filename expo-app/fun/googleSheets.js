@@ -6,7 +6,6 @@ import { handleDeepLink } from "./googleFun";
 
 export async function pickGoogleSheet() {
   try {
-    console.log("Function entered");
     handleDeepLink();
 
     const sessionToken = await SecureStore.getItemAsync("sessionToken");

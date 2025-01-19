@@ -10,8 +10,8 @@ import AddTypeBox from "./components/AddTypeBox";
 import SettingsScreen from "./components/Settings";
 import MonthPicker from "./components/MonthPicker";
 import appStartup from "./fun/filestartup.js";
-import { checkLoggedIn, refreshToken } from "./fun/googleFun.js";
-import pickGoogleSheet from "./fun/googleSheets.js";
+import { checkLoggedIn, refreshToken } from "./fun/googleFun";
+import { pickGoogleSheet } from "./fun/googleSheets";
 
 const preferencesFilePath = `${FileSystem.documentDirectory}preferences.json`;
 const typelistFilePath = `${FileSystem.documentDirectory}typelist.json`;
@@ -170,7 +170,7 @@ export default function App() {
               theme="spreadsheet"
               label={currentSheet}
               onPress={async () => {
-                pickGoogleSheet();
+                await pickGoogleSheet();
               }}
             />
             <Button

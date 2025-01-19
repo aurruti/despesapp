@@ -98,6 +98,7 @@ export default function Button({ label, theme, onPress, background }) {
       </View>
     );
   }
+
   if (theme === "month") {
     return (
       <View

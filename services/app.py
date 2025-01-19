@@ -215,7 +215,7 @@ async def sheets_picker(
     # Get the user's tokens
     async with db.execute(
         "SELECT access_token, refresh_token FROM tokens WHERE user_id = ?",
-        (user_info["id"],)
+        (user_info["id"])
     ) as cursor:
         token_data = await cursor.fetchone()
         
