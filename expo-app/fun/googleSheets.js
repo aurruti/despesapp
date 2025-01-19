@@ -45,15 +45,11 @@ export async function addNewSheet(
 
     // Verify sheet access
     const sessionToken = await SecureStore.getItemAsync("sessionToken");
-    const response = await fetch(`${API_URL}/api/sheets/selected`, {
-      method: "POST",
+    const response = await fetch(`${API_URL}/api/sheets/verify/${sheetId}`, {
       headers: {
-        "Content-Type": "application/json",
         Authorization: `Bearer ${sessionToken}`,
       },
-      body: JSON.stringify({ spreadsheetId: sheetId }),
     });
-
     if (!response.ok) {
       throw new Error("Unable to access sheet");
     }

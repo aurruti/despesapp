@@ -202,60 +202,33 @@ async def logout(
     return JSONResponse({"status": "Logged out successfully"})
 
 
-@app.post("/api/sheets/selected")
-async def handle_selected_sheet(
-    selection: SpreadsheetSelection,
+@app.get("/api/sheets/verify/{sheet_id}")
+async def verify_sheet_access(
+    sheet_id: str,
     session: UserSession = Depends(verify_session_token),
     db: aiosqlite.Connection = Depends(get_db)
 ):
-    """Handle the spreadsheet selected by the user through the picker"""
-    # Get the user's tokens
+    """Verify access to a specific sheet and return its metadata"""
     async with db.execute(
-        "SELECT access_token, refresh_token FROM tokens WHERE user_id = ?",
+        "SELECT access_token FROM tokens WHERE user_id = ?",
         (session.user_id,)
     ) as cursor:
         token_data = await cursor.fetchone()
-        
-    if not token_data:
-        raise HTTPException(status_code=401, detail="No tokens found")
+        if not token_data:
+            raise HTTPException(status_code=401, detail="No tokens found")
 
-    credentials = Credentials(
-        token=token_data[0],
-        refresh_token=token_data[1],
-        client_id=env("GOOGLE_CLIENT_ID"),
-        client_secret=env("GOOGLE_CLIENT_SECRET"),
-        token_uri="https://oauth2.googleapis.com/token",
-        scopes=['https://www.googleapis.com/auth/spreadsheets.readonly']
-    )
+    credentials = Credentials(token_data[0])
 
     try:
-        # Verify we can access the spreadsheet
-        service = build('sheets', 'v4', credentials=credentials)
-        service.spreadsheets().get(spreadsheetId=selection.spreadsheetId).execute()
-
-        # Store the selected spreadsheet
-        await db.execute(
-            """
-            INSERT INTO selected_spreadsheets (user_id, spreadsheet_id, name) 
-            VALUES (?, ?, ?)
-            ON CONFLICT (user_id) DO UPDATE SET 
-                spreadsheet_id = excluded.spreadsheet_id,
-                name = excluded.name
-            """,
-            (session.user_id, selection.spreadsheetId, selection.name)
-        )
-        await db.commit()
-
-        print(str(datetime.now(tz=timezone.utc)) + f">> User {session.email} selected spreadsheet {selection.spreadsheetId}.")
-        return {"message": "Spreadsheet successfully selected and saved"}
-
+        service = build("sheets", "v4", credentials=credentials)
+        sheet_metadata = service.spreadsheets().get(spreadsheetId=sheet_id).execute()
+        
+        return JSONResponse({
+            "id": sheet_id,
+            "name": sheet_metadata.get('properties', {}).get('title', 'Untitled')
+        })
     except Exception as e:
-        print(f"Error accessing spreadsheet: {str(e)}")
-        raise HTTPException(
-            status_code=500,
-            detail="Failed to verify access to the selected spreadsheet"
-        )
-
+        raise HTTPException(status_code=404, detail="Sheet not found or not accessible")
 
 
 if __name__ == "__main__":
