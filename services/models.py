@@ -6,6 +6,11 @@ class UserSession(BaseModel):
     email: str
     exp: datetime
 
-class SpreadsheetSelection(BaseModel):
-    spreadsheetId: str
-    name: str
+class SpreadsheetSpendingSelection(BaseModel):
+    sheetId: str
+    amount: float
+    type: str
+    month: str
+    year: int
+    colOffset: int = 0
+    rowOffset: int = 0
