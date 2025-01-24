@@ -69,7 +69,6 @@ async def get_google_user_info(access_token: str) -> dict:
         return response.json()
 
 
-
 ###########################################################################################################################################
 #### API Endpoints ########################################################################################################################
 ###########################################################################################################################################
@@ -237,6 +236,9 @@ async def edit_spreadsheet(
     db: aiosqlite.Connection = Depends(get_db)
 ):
     """Edit a specific cell in a Google Spreadsheet to add a spending."""
+
+    print("Data recieved" + str(sheet_data))
+
     # Retrieve access token
     async with db.execute(
         "SELECT access_token FROM tokens WHERE user_id = ?",
@@ -254,6 +256,8 @@ async def edit_spreadsheet(
         spreadsheet = service.spreadsheets()
         sheet_metadata = spreadsheet.get(spreadsheetId=sheet_data.sheetId).execute()
         
+        print(sheet_metadata)
+
         # Find the specific sheet by year
         sheet_name = next(
             (sheet['properties']['title'] for sheet in sheet_metadata.get('sheets', []) 
@@ -262,6 +266,7 @@ async def edit_spreadsheet(
         )
         if not sheet_name:
             raise HTTPException(status_code=404, detail=f"Sheet for year {sheet_data.year} not found")
+        print(sheet_name)
 
         # Find column by month
         column_range = f"{sheet_name}!1:1"
@@ -275,6 +280,7 @@ async def edit_spreadsheet(
             col_index = headers.index(sheet_data.month) + sheet_data.colOffset
         except ValueError:
             raise HTTPException(status_code=404, detail=f"Month {sheet_data.month} not found")
+        print(col_index)
 
         # Find row by type
         type_range = f"{sheet_name}!A:A"
@@ -288,11 +294,13 @@ async def edit_spreadsheet(
             row_index = [row[0] for row in types].index(sheet_data.type) + sheet_data.rowOffset
         except ValueError:
             raise HTTPException(status_code=404, detail=f"Type {sheet_data.type} not found")
+        print(row_index)
 
         # Construct cell reference
         col_letter = chr(65 + col_index)  # A is 65 in ASCII
         cell = f"{col_letter}{row_index + 1}"
         cell_range = f"{sheet_name}!{cell}"
+        print(cell_range)
 
         # Read current cell value
         current_cell = spreadsheet.values().get(
@@ -301,12 +309,14 @@ async def edit_spreadsheet(
         ).execute()
         
         current_value = current_cell.get('values', [['']])[0][0] if current_cell.get('values') else ''
+        print(current_value)
 
         # Prepare new value
         if not current_value:
             new_value = f"={sheet_data.amount}"
         else:
             new_value = f"{current_value}+{sheet_data.amount}"
+        print(new_value)
 
         # Update the cell
         body = {
@@ -318,6 +328,7 @@ async def edit_spreadsheet(
             valueInputOption='USER_ENTERED',
             body=body
         ).execute()
+        print(result)
 
         return JSONResponse({
             "status": "Success",

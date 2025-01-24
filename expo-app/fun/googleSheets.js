@@ -86,6 +86,8 @@ export async function addSpendingToSheet(
 ) {
   try {
     const sessionToken = await SecureStore.getItemAsync("sessionToken");
+    console.log("Attempting to add spending to sheet", sheetId);
+    console.log(currentMonthLoc, currentYear, sheetName, sheetId);
     await fetch(`${API_URL}/api/sheets/addspending`, {
       method: "POST",
       headers: {
