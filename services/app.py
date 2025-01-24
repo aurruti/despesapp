@@ -12,7 +12,7 @@ import json
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 
-from models import UserSession
+from models import UserSession, SpreadsheetSpendingSelection
 from db_handling import init_db, get_db
 
 
@@ -229,6 +229,105 @@ async def verify_sheet_access(
         })
     except Exception as e:
         raise HTTPException(status_code=404, detail="Sheet not found or not accessible")
+
+@app.post("/api/sheets/addspending")
+async def edit_spreadsheet(
+    sheet_data: SpreadsheetSpendingSelection,
+    session: UserSession = Depends(verify_session_token),
+    db: aiosqlite.Connection = Depends(get_db)
+):
+    """Edit a specific cell in a Google Spreadsheet to add a spending."""
+    # Retrieve access token
+    async with db.execute(
+        "SELECT access_token FROM tokens WHERE user_id = ?",
+        (session.user_id,)
+    ) as cursor:
+        token_data = await cursor.fetchone()
+        if not token_data:
+            raise HTTPException(status_code=401, detail="No tokens found")
+
+    credentials = Credentials(token_data[0])
+    service = build("sheets", "v4", credentials=credentials)
+
+    try:
+        # Get sheet metadata
+        spreadsheet = service.spreadsheets()
+        sheet_metadata = spreadsheet.get(spreadsheetId=sheet_data.sheetId).execute()
+        
+        # Find the specific sheet by year
+        sheet_name = next(
+            (sheet['properties']['title'] for sheet in sheet_metadata.get('sheets', []) 
+             if sheet['properties']['title'] == str(sheet_data.year)), 
+            None
+        )
+        if not sheet_name:
+            raise HTTPException(status_code=404, detail=f"Sheet for year {sheet_data.year} not found")
+
+        # Find column by month
+        column_range = f"{sheet_name}!1:1"
+        result = spreadsheet.values().get(
+            spreadsheetId=sheet_data.sheetId, 
+            range=column_range
+        ).execute()
+        
+        headers = result.get('values', [[]])[0]
+        try:
+            col_index = headers.index(sheet_data.month) + sheet_data.colOffset
+        except ValueError:
+            raise HTTPException(status_code=404, detail=f"Month {sheet_data.month} not found")
+
+        # Find row by type
+        type_range = f"{sheet_name}!A:A"
+        result = spreadsheet.values().get(
+            spreadsheetId=sheet_data.sheetId, 
+            range=type_range
+        ).execute()
+        
+        types = result.get('values', [[]])
+        try:
+            row_index = [row[0] for row in types].index(sheet_data.type) + sheet_data.rowOffset
+        except ValueError:
+            raise HTTPException(status_code=404, detail=f"Type {sheet_data.type} not found")
+
+        # Construct cell reference
+        col_letter = chr(65 + col_index)  # A is 65 in ASCII
+        cell = f"{col_letter}{row_index + 1}"
+        cell_range = f"{sheet_name}!{cell}"
+
+        # Read current cell value
+        current_cell = spreadsheet.values().get(
+            spreadsheetId=sheet_data.sheetId, 
+            range=cell_range
+        ).execute()
+        
+        current_value = current_cell.get('values', [['']])[0][0] if current_cell.get('values') else ''
+
+        # Prepare new value
+        if not current_value:
+            new_value = f"={sheet_data.amount}"
+        else:
+            new_value = f"{current_value}+{sheet_data.amount}"
+
+        # Update the cell
+        body = {
+            'values': [[new_value]]
+        }
+        result = spreadsheet.values().update(
+            spreadsheetId=sheet_data.sheetId, 
+            range=cell_range,
+            valueInputOption='USER_ENTERED'
+            body=body
+        ).execute()
+
+        return JSONResponse({
+            "status": "Success",
+            "cell": cell,
+            "oldValue": current_value,
+            "newValue": new_value
+        })
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 if __name__ == "__main__":
