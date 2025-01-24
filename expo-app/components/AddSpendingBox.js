@@ -1,28 +1,52 @@
-import { useState, useEffect } from 'react';
-import {Alert, BackHandler, StyleSheet, View, Text, TextInput, FlatList, ScrollView} from 'react-native';
-import * as FileSystem from 'expo-file-system';
+import { useState, useEffect } from "react";
+import {
+  Alert,
+  BackHandler,
+  StyleSheet,
+  View,
+  Text,
+  TextInput,
+  FlatList,
+} from "react-native";
+import * as FileSystem from "expo-file-system";
 
-import Button from './Button';
-import CircleButton from './CircleButton';
+import Button from "./Button";
+import CircleButton from "./CircleButton";
+import { addSpendingToSheet } from "../fun/googleSheets";
 
-export default function AddSpendingBox({currentSheet, currency, typelistFilePath, amount, setAmount, typeSpend, setTypeSpend, addAction, addTypeAction, exitAction}) {
+export default function AddSpendingBox({
+  currentSheet,
+  currentSheetId,
+  currency,
+  typelistFilePath,
+  typeSpend,
+  setTypeSpend,
+  addTypeAction,
+  exitAction,
+  colOffset,
+  rowOffset,
+}) {
+  const [amount, setAmount] = useState("");
   const [typelist, setTypelist] = useState([]);
-  const typeWarning = "No hi ha cap tipus de despesa definit pel full sel·leccionat. Afegiu-ne una!"
+  const typeWarning =
+    "No hi ha cap tipus de despesa definit pel full sel·leccionat. Afegiu-ne una!";
   const handleAmountChange = (text) => {
     // Replace commas with periods
-    let formattedText = text.replace(',', '.');
-    
+    let formattedText = text.replace(",", ".");
+
     // Allow only numbers and a single decimal point, plus the negative
-    formattedText = formattedText.replace(/[^0-9.-]/g, '');
-    
+    formattedText = formattedText.replace(/[^0-9.-]/g, "");
+
     // Ensure there is only one decimal point
-    const decimalIndex = formattedText.indexOf('.');
+    const decimalIndex = formattedText.indexOf(".");
     if (decimalIndex !== -1) {
-      formattedText = formattedText.slice(0, decimalIndex + 1) + formattedText.slice(decimalIndex + 1).replace(/\./g, '');
+      formattedText =
+        formattedText.slice(0, decimalIndex + 1) +
+        formattedText.slice(decimalIndex + 1).replace(/\./g, "");
     }
     // Negative only at the begining
-    if (formattedText.startsWith('-')) {
-      formattedText = '-' + formattedText.slice(1).replace(/-/g, '');
+    if (formattedText.startsWith("-")) {
+      formattedText = "-" + formattedText.slice(1).replace(/-/g, "");
     }
 
     setAmount(formattedText);
@@ -31,7 +55,9 @@ export default function AddSpendingBox({currentSheet, currency, typelistFilePath
   useEffect(() => {
     const loadTypelist = async () => {
       try {
-        const fileContents = await FileSystem.readAsStringAsync(typelistFilePath);
+        const fileContents = await FileSystem.readAsStringAsync(
+          typelistFilePath
+        );
         setTypelist(JSON.parse(fileContents));
       } catch (error) {
         console.error("Error loading typelist:", error);
@@ -44,7 +70,7 @@ export default function AddSpendingBox({currentSheet, currency, typelistFilePath
       return true;
     };
     const backHandler = BackHandler.addEventListener(
-      'hardwareBackPress',
+      "hardwareBackPress",
       handleBackButtonPress
     );
     return () => {
@@ -52,134 +78,209 @@ export default function AddSpendingBox({currentSheet, currency, typelistFilePath
     };
   }, [exitAction]);
 
-  const filteredTypes = typelist.filter(button => button.sheet === currentSheet);
-  const renderButton = ({ item }) => (
-    (item.type === typeSpend) ? (
-      <Button theme='type-selected' label = {item.type} background = {item.color} onPress={() => setTypeSpend(item.type)}/>
-     ) : (
-      <Button theme='type-unselected' label = {item.type} background = {item.color} onPress={() => setTypeSpend(item.type)}/>
-     )
+  const filteredTypes = typelist.filter(
+    (button) => button && button.sheet === currentSheet
   );
+  const renderButton = ({ item }) =>
+    item.type === typeSpend ? (
+      <Button
+        theme="type-selected"
+        label={item.type}
+        background={item.color}
+        onPress={() => setTypeSpend(item.type)}
+      />
+    ) : (
+      <Button
+        theme="type-unselected"
+        label={item.type}
+        background={item.color}
+        onPress={() => setTypeSpend(item.type)}
+      />
+    );
 
   const typeAmountCheck = () => {
-    if (filteredTypes.length === 0){
-      Alert.alert("Avís: cap tipus definit", "No s'ha definit cap tipus de despesa pel full sel·leccionat. Cada despesa ha de correspondre a un tipus de despesa. Afegiu-ne alguns per començar a comptar despeses!");
-    } else if (amount === '') {
-      Alert.alert("Avís: despesa nul·la", "La despesa a afegir ha de tenir un valor numèric diferent a zero.")
-    } else if (typeSpend === '') {
-      Alert.alert("Avís: no s'ha triat tipus",'No heu triat cap tipus de despesa! Cada despesa ha de correspondre a un tipus de despesa.');
+    if (filteredTypes.length === 0) {
+      Alert.alert(
+        "Avís: cap tipus definit",
+        "No s'ha definit cap tipus de despesa pel full sel·leccionat. Cada despesa ha de correspondre a un tipus de despesa. Afegiu-ne alguns per començar a comptar despeses!"
+      );
+      return false;
+    } else if (amount === "") {
+      Alert.alert(
+        "Avís: despesa nul·la",
+        "La despesa a afegir ha de tenir un valor numèric diferent a zero."
+      );
+      return false;
+    } else if (typeSpend === "") {
+      Alert.alert(
+        "Avís: no s'ha triat tipus",
+        "No heu triat cap tipus de despesa! Cada despesa ha de correspondre a un tipus de despesa."
+      );
+      return false;
     } else {
-      addAction();
+      return true;
     }
+  };
+
+  const triggerAddSpending = async () => {
+    console.log("triggerAddSpending");
+    await addSpendingToSheet(
+      amount,
+      typeSpend,
+      currentSheet,
+      currentSheetId,
+      month,
+      year,
+      colOffset,
+      rowOffset
+    );
+    setAmount("");
   };
 
   return (
     <View style={styles.container}>
-    <View style={styles.bigBox}>
-      <View style={styles.topRow}>
-        <CircleButton type='exit-top-2' border='transparent' onPress={exitAction}/>
-        <Text style={styles.header}>Afegeix una nova despesa</Text>
-      </View>
-      <View style={[styles.innerBox, {top: 70}]}>
-        <View style={[styles.inputContainer, {flex:2/3}]}>
-          <TextInput
-            style={styles.input}
-            keyboardType="numeric"
-            value={amount}
-            onChangeText={handleAmountChange}
-            placeholder="0.00"
+      <View style={styles.bigBox}>
+        <View style={styles.topRow}>
+          <CircleButton
+            type="exit-top-2"
+            border="transparent"
+            onPress={exitAction}
           />
-          <Text style={styles.currencySymbol}>{currency}</Text>
+          <Text style={styles.header}>Afegeix una nova despesa</Text>
         </View>
-        <Button theme='addspend' onPress={typeAmountCheck}/>
-      </View>
-      
-      {filteredTypes.length === 0 ? (
-        <View style={[styles.innerBox, {top: 150, height:'42%'}]}>
-          <Text style={styles.textWarning}>{typeWarning}</Text>
-          <Button theme='addtypetext' label='Nou tipus' onPress={addTypeAction}/>
-        </View>
-      ) : filteredTypes.length === 1 ? (
-        <View style={[styles.innerBox, {top: 150, height:'45%'}]}>
-          {renderButton({ item: filteredTypes[0] })}
-          <Button theme='addtypetext' label='Nou tipus' onPress={addTypeAction}/>
-        </View>
-      ) : filteredTypes.length === 2 ? (
-        <View style={[styles.innerBox, {top: 150, height:'45%'}]}>
-          {renderButton({ item: filteredTypes[0] })}
-          {renderButton({ item: filteredTypes[1] })}
-          <Button theme='addtypetext' label='Nou tipus' onPress={addTypeAction}/>
-        </View>
-      ) : (
-        <View style={[styles.innerBox, {alignItems:"center", flexDirection:"column", top: 140, height:'55%'}]}>
-          <FlatList
-            data={filteredTypes}
-            renderItem={renderButton}
-            keyExtractor={(item, index) => index.toString()}
-            numColumns={3} 
+        <View style={[styles.innerBox, { top: 70 }]}>
+          <View style={[styles.inputContainer, { flex: 2 / 3 }]}>
+            <TextInput
+              style={styles.input}
+              keyboardType="numeric"
+              value={amount}
+              onChangeText={handleAmountChange}
+              placeholder="0.00"
+            />
+            <Text style={styles.currencySymbol}>{currency}</Text>
+          </View>
+          <Button
+            theme="addspend"
+            onPress={async () => {
+              if (typeAmountCheck()) {
+                await triggerAddSpending();
+              }
+            }}
           />
-          <Button theme='addtypetext' label='Nou tipus' onPress={addTypeAction}/>
         </View>
-      )}
+
+        {filteredTypes.length === 0 ? (
+          <View style={[styles.innerBox, { top: 150, height: "42%" }]}>
+            <Text style={styles.textWarning}>{typeWarning}</Text>
+            <Button
+              theme="addtypetext"
+              label="Nou tipus"
+              onPress={addTypeAction}
+            />
+          </View>
+        ) : filteredTypes.length === 1 ? (
+          <View style={[styles.innerBox, { top: 150, height: "45%" }]}>
+            {renderButton({ item: filteredTypes[0] })}
+            <Button
+              theme="addtypetext"
+              label="Nou tipus"
+              onPress={addTypeAction}
+            />
+          </View>
+        ) : filteredTypes.length === 2 ? (
+          <View style={[styles.innerBox, { top: 150, height: "45%" }]}>
+            {renderButton({ item: filteredTypes[0] })}
+            {renderButton({ item: filteredTypes[1] })}
+            <Button
+              theme="addtypetext"
+              label="Nou tipus"
+              onPress={addTypeAction}
+            />
+          </View>
+        ) : (
+          <View
+            style={[
+              styles.innerBox,
+              {
+                alignItems: "center",
+                flexDirection: "column",
+                top: 140,
+                height: "55%",
+              },
+            ]}
+          >
+            <FlatList
+              data={filteredTypes}
+              renderItem={renderButton}
+              keyExtractor={(item, index) => index.toString()}
+              numColumns={3}
+            />
+            <Button
+              theme="addtypetext"
+              label="Nou tipus"
+              onPress={addTypeAction}
+            />
+          </View>
+        )}
+      </View>
     </View>
-    </View>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    width:'85%',
-    backgroundColor: 'transparent'
+    justifyContent: "center",
+    alignItems: "center",
+    width: "85%",
+    backgroundColor: "transparent",
   },
   bigBox: {
-    justifyContent:'center',
-    alignItems:'center',
-    width: '100%',  
-    height: 350, // height: '50%',    
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
+    height: 350, // height: '50%',
     borderRadius: 10,
-    backgroundColor: '#F6F8F8',
+    backgroundColor: "#F6F8F8",
   },
   topRow: {
-    flexDirection: 'row', 
-    justifyContent: 'flex-start', 
-    alignItems: 'center', 
-    height: 50, 
-    width: '108%', 
-    position: 'absolute', 
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    alignItems: "center",
+    height: 50,
+    width: "108%",
+    position: "absolute",
     top: 0,
   },
-  header : {
+  header: {
     fontSize: 16,
     paddingLeft: 10,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   innerBox: {
-    flexDirection:'row',
-    flexWrap: 'wrap',
-    justifyContent:'center',
-    alignItems:'flex-start',
-    position:'absolute',
-    flex: 1/3,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    alignItems: "flex-start",
+    position: "absolute",
+    flex: 1 / 3,
     gap: 10,
   },
-  textWarning:{
-    width:'85%',
+  textWarning: {
+    width: "85%",
     fontSize: 18,
-    color:'black',
+    color: "black",
     marginLeft: 35,
   },
   inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     borderWidth: 1,
-    borderColor: '#ccc',
-    width:"50%",
+    borderColor: "#ccc",
+    width: "50%",
     borderRadius: 3,
     paddingHorizontal: 10,
-    flex : 1,
+    flex: 1,
   },
   input: {
     flex: 1,
@@ -192,8 +293,8 @@ const styles = StyleSheet.create({
   },
   buttoncontainer: {
     flexGrow: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: '100%',
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
   },
 });

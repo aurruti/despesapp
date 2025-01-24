@@ -1,5 +1,6 @@
 import { API_URL } from "@env";
 import * as SecureStore from "expo-secure-store";
+import { ToastAndroid } from "react-native";
 
 const STORAGE_KEY = "accessedSheets";
 
@@ -67,7 +68,58 @@ export async function addNewSheet(
     setSheets(updatedSheets);
     setNewSheetUrl("");
     setError("");
+    return sheetData.name, sheetData.id;
   } catch (e) {
     setError("Error adding sheet: " + e.message);
+  }
+}
+
+export async function addSpendingToSheet(
+  amount,
+  type,
+  sheetName,
+  sheetId,
+  currentMonthLoc,
+  currentYear,
+  colOffset,
+  rowOffset
+) {
+  try {
+    const sessionToken = await SecureStore.getItemAsync("sessionToken");
+    await fetch(`${API_URL}/api/sheets/addspending`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${sessionToken}`,
+      },
+      body: JSON.stringify({
+        sheetId,
+        amount,
+        type,
+        month,
+        year,
+        colOffset,
+        rowOffset,
+      }),
+    });
+
+    console.log(
+      "Added",
+      amount,
+      "under type",
+      type,
+      "for ",
+      currentMonthLoc,
+      currentYear,
+      "to",
+      sheetName,
+      "(" + sheetId + ") with offset (row, col)",
+      rowOffset,
+      colOffset
+    );
+    ToastAndroid.show("S'ha afegit la despesa.", ToastAndroid.SHORT);
+  } catch (e) {
+    console.error("Error adding spending:", e);
+    ToastAndroid.show("No s'ha pogut afegir la despesa.", ToastAndroid.SHORT);
   }
 }

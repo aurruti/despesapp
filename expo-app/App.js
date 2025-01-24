@@ -29,13 +29,13 @@ export default function App() {
   const [colOffset, setColOffset] = useState(0);
   const [rowOffset, setRowOffset] = useState(0);
   const [currentSheet, setCurrentSheet] = useState("");
+  const [currentSheetId, setCurrentSheetId] = useState("");
 
   const [currentMonth, setCurrentMonth] = useState("");
   const [currentMonthLoc, setCurrentMonthLoc] = useState("");
   const [currentYear, setCurrentYear] = useState("");
   const currentMonthYearLoc = `${currentMonthLoc} ${currentYear}`;
 
-  const [spendAmount, setSpendAmount] = useState("");
   const [spendType, setSpendType] = useState("");
 
   const [loggedIn, setLoggedIn] = useState(false);
@@ -55,11 +55,18 @@ export default function App() {
         const preferencesData = await FileSystem.readAsStringAsync(
           preferencesFilePath
         );
-        const { language, currency, lastSheet, colOffset, rowOffset } =
-          JSON.parse(preferencesData);
+        const {
+          language,
+          currency,
+          lastSheet,
+          lastSheetId,
+          colOffset,
+          rowOffset,
+        } = JSON.parse(preferencesData);
         setLanguage(language);
         setCurrency(currency);
         setCurrentSheet(lastSheet);
+        setCurrentSheetId(lastSheetId);
         setColOffset(colOffset);
         setRowOffset(rowOffset);
 
@@ -86,14 +93,6 @@ export default function App() {
     Startup();
     TokenRefreshWrap();
   }, [setLoggedIn]);
-
-  const triggerAddSpend = async () => {
-    ToastAndroid.show(
-      "La despesa s'ha afegit correctament",
-      ToastAndroid.SHORT
-    );
-    setSpendAmount("");
-  };
 
   return (
     <View style={styles.container}>
@@ -136,21 +135,25 @@ export default function App() {
           ) : showAddSpending ? (
             <AddSpendingBox
               currentSheet={currentSheet}
+              currentSheetId={currentSheetId}
               currency={currency}
               typelistFilePath={typelistFilePath}
-              amount={spendAmount}
-              setAmount={setSpendAmount}
               typeSpend={spendType}
               setTypeSpend={setSpendType}
-              addAction={triggerAddSpend}
               addTypeAction={() => setShowAddType(true)}
               exitAction={() => setShowAddSpending(false)}
+              colOffset={colOffset}
+              rowOffset={rowOffset}
+              currentMonthLoc={currentMonthLoc}
+              currentYear={currentYear}
             />
           ) : showFilePicker ? (
             <View>
               <GoogleSheetPicker
-                currentSheet={currentSheet}
                 setCurrentSheet={setCurrentSheet}
+                currentSheetId={currentSheetId}
+                setCurrentSheetId={setCurrentSheetId}
+                preferencesFilePath={preferencesFilePath}
               />
             </View>
           ) : showMonthPicker && !showAppOptions ? (
@@ -175,7 +178,7 @@ export default function App() {
           <View style={styles.optionsRow}>
             <Button
               theme="spreadsheet"
-              label={currentSheet}
+              label={showFilePicker ? "Torna a l'inici" : currentSheet}
               onPress={() => {
                 setShowMonthPicker(false);
                 setShowAddType(false);
