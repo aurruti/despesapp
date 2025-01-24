@@ -1,7 +1,8 @@
 {
   "language": "cat",
   "currency": "€",
-  "lastSheet": "none",
-  "colOffset": 1,
+  "lastSheet": "cap",
+  "lastSheetId": "none",
+  "colOffset": 0,
   "rowOffset": 0
 }

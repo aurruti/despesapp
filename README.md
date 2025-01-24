@@ -7,9 +7,9 @@ This is very much WIP!
 
 ## Acknogledgements
 
-The placeholder icon is original from https://www.pxfuel.com/en/desktop-wallpaper-dgmxw - if you are the original artist, please contact me!
+The icon and the splashcreen image has been extracted from https://www.pxfuel.com/en/desktop-wallpaper-dgmxw - if you are the original artist, please contact me!
 
-The code included herein can contain some Copilot-generated lines of code in the instances where the use made sense and generated useful results; always with suprevision and testing.z
+The code included herein can contain some Copilot-generated lines of code in the instances where the use made sense and generated useful results; always with suprevision and testing.
 
 ## CC BY-SA 4.0 Licensing
 

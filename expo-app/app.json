@@ -2,10 +2,10 @@
   "expo": {
     "name": "DespesApp",
     "slug": "despesapp",
-    "version": "0.1.0",
-    "icon": "./assets/icon_prov.png",
+    "version": "0.2.0",
+    "icon": "./assets/kikki_icon.jpeg",
     "splash": {
-      "image": "./assets/images/placeholder.png",
+      "image": "./assets/kikki_splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#181520"
     },
@@ -22,7 +22,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/placeholder.png",
+        "foregroundImage": "./assets/kikki_icon.jpeg",
         "backgroundColor": "#FFFFFF"
       },
       "package": "cat.aurruti.despesapp",
@@ -42,7 +42,7 @@
       ]
     },
     "web": {
-      "favicon": "./assets/images/placeholder.png"
+      "favicon": "./assets/kikki_icon.jpeg"
     },
     "extra": {
       "eas": {

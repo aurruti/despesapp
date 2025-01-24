@@ -287,7 +287,10 @@ export default function Button({ label, theme, onPress, background }) {
           onPress={onPress}
         >
           <Text
-            style={[styles.buttonLabel, { color: "#25292e", fontSize: 14 }]}
+            style={[
+              styles.buttonLabel,
+              { color: "#25292e", fontSize: 14, fontWeight: "bold" },
+            ]}
           >
             {label}
           </Text>
