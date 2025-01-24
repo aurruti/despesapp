@@ -315,7 +315,7 @@ async def edit_spreadsheet(
         result = spreadsheet.values().update(
             spreadsheetId=sheet_data.sheetId, 
             range=cell_range,
-            valueInputOption='USER_ENTERED'
+            valueInputOption='USER_ENTERED',
             body=body
         ).execute()
 
