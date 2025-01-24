@@ -1,6 +1,6 @@
 import aiosqlite
 
-DATABASE_PATH = "aut.db"
+DATABASE_PATH = "/app/database/despesapp.db"
 
 async def init_db():
     """Initialize the SQLite database with required tables"""
