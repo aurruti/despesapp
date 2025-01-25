@@ -12,6 +12,7 @@ import MonthPicker from "./components/MonthPicker";
 import appStartup from "./fun/filestartup.js";
 import { checkLoggedIn, refreshToken } from "./fun/googleFun";
 import GoogleSheetPicker from "./components/GoogleSheetPicker.js";
+import { LoadingOverlay } from "./components/Loading.js";
 
 const preferencesFilePath = `${FileSystem.documentDirectory}preferences.json`;
 const typelistFilePath = `${FileSystem.documentDirectory}typelist.json`;
@@ -37,8 +38,9 @@ export default function App() {
   const currentMonthYearLoc = `${currentMonthLoc} ${currentYear}`;
 
   const [spendType, setSpendType] = useState("");
-
   const [loggedIn, setLoggedIn] = useState(false);
+
+  const [isLoading, setIsLoading] = useState(true);
 
   {
     /*INITIALIZATION */
@@ -85,14 +87,18 @@ export default function App() {
 
     const TokenRefreshWrap = async () => {
       await checkLoggedIn(setLoggedIn);
-      if (loggedIn) {
-        await refreshToken();
-      }
+      setTimeout(async () => {
+        if (loggedIn) {
+          await refreshToken();
+        }
+        setIsLoading(false);
+      }, 500);
     };
 
+    setIsLoading(true);
     Startup();
     TokenRefreshWrap();
-  }, [setLoggedIn]);
+  }, [setLoggedIn, checkLoggedIn, refreshToken]);
 
   return (
     <View style={styles.container}>
@@ -120,6 +126,15 @@ export default function App() {
                 setShowAddType(false);
                 setShowAddSpending(false);
               }}
+            />
+            <LoadingOverlay
+              visible={isLoading}
+              backgroundColor="transparent"
+              color="#6CD049"
+              opacity={1}
+              scale={1}
+              marginTop={0}
+              width="40%"
             />
           </View>
           {showAddType ? (
@@ -223,6 +238,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 60,
   },
+
   optionsRow: {
     alignItems: "center",
     flexDirection: "row",

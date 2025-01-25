@@ -185,9 +185,9 @@ async def refresh_token(
     ))
     await db.commit()
     refreshed_token = create_session_token({"id": session.user_id, "email": session.email})
-    print(str(datetime.now(tz=timezone.utc)) + ">> Successful token refresh for user with email: " + session.email)
+    print(str(datetime.now(tz=timezone.utc)) + ">> Successful token refresh for user with email: " + session.email + " (expires " + str(expires_at) + ")")
 
-    return JSONResponse({"status": "Token refreshed successfully", "token": refreshed_token})
+    return JSONResponse({"status": "Token refreshed successfully", "token": refreshed_token, "expires_at": str(expires_at.isoformat())})
 
 @app.post("/api/logout")
 async def logout(

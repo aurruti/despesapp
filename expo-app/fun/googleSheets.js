@@ -34,14 +34,16 @@ export async function addNewSheet(
   newSheetUrl,
   setNewSheetUrl,
   sheets,
-  setSheets,
-  setError
+  setSheets
 ) {
   try {
     const sheetId = extractSheetId(newSheetUrl);
     if (!sheetId) {
-      setError("Invalid sheet URL or ID");
-      return;
+      Alert.alert(
+        "Error en afegir el full",
+        "La URL o el codi proporcionat no és vàlid."
+      );
+      return [null, null];
     }
 
     // Verify sheet access
@@ -52,7 +54,9 @@ export async function addNewSheet(
       },
     });
     if (!response.ok) {
-      throw new Error("Unable to access sheet");
+      throw new Error(
+        "No s'ha pogut accedir al full. Comproveu que el codi o la URL sigui correcta i que el vostre compte de Google hi tingui accés."
+      );
     }
 
     const sheetData = await response.json();
@@ -67,10 +71,10 @@ export async function addNewSheet(
     await SecureStore.setItemAsync(STORAGE_KEY, JSON.stringify(updatedSheets));
     setSheets(updatedSheets);
     setNewSheetUrl("");
-    setError("");
     return sheetData.name, sheetData.id;
   } catch (e) {
-    setError("Error adding sheet: " + e.message);
+    Alert.alert("Error en afegir el full", e.message);
+    return [null, null];
   }
 }
 

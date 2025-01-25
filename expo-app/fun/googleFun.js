@@ -34,7 +34,7 @@ export async function refreshToken() {
 
     const data = await response.json();
     await SecureStore.setItemAsync("sessionToken", data.token);
-    console.log(data.status + ".");
+    console.log(data.status + ". Expires: " + data.expires_at);
   } catch (error) {
     console.error("Token refresh failed: " + error.message);
   }
@@ -115,7 +115,7 @@ export async function checkSession() {
     });
 
     const data = await response.json();
-    console.log(`Session active for: ${data.email}. Expires: ${data.exp}`);
+    console.log(`Session active for: ${data.email}.`);
 
     let sessionName = await SecureStore.getItemAsync("userInfo");
     sessionName = sessionName.replace(/'/g, '"').replace(/True/g, "true");

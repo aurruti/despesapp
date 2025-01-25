@@ -12,6 +12,7 @@ import * as FileSystem from "expo-file-system";
 
 import Button from "./Button";
 import CircleButton from "./CircleButton";
+import { LoadingOverlay } from "./Loading";
 import { addSpendingToSheet } from "../fun/googleSheets";
 
 export default function AddSpendingBox({
@@ -30,6 +31,7 @@ export default function AddSpendingBox({
 }) {
   const [amount, setAmount] = useState("");
   const [typelist, setTypelist] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const typeWarning =
     "No hi ha cap tipus de despesa definit pel full sel·leccionat. Afegiu-ne una!";
   const handleAmountChange = (text) => {
@@ -125,17 +127,23 @@ export default function AddSpendingBox({
   };
 
   const triggerAddSpending = async () => {
-    await addSpendingToSheet(
-      amount,
-      typeSpend,
-      currentSheet,
-      currentSheetId,
-      currentMonthLoc,
-      currentYear,
-      colOffset,
-      rowOffset
-    );
-    setAmount("");
+    if (!isLoading) {
+      setIsLoading(true);
+      await addSpendingToSheet(
+        amount,
+        typeSpend,
+        currentSheet,
+        currentSheetId,
+        currentMonthLoc,
+        currentYear,
+        colOffset,
+        rowOffset
+      );
+      setAmount("");
+      setIsLoading(false);
+    } else {
+      console.warn("Aborted addSpendingToSheet: something is still loading.");
+    }
   };
 
   return (
@@ -149,6 +157,13 @@ export default function AddSpendingBox({
           />
           <Text style={styles.header}>Afegeix una nova despesa</Text>
         </View>
+        <LoadingOverlay
+          visible={isLoading}
+          borderRadius={styles.bigBox.borderRadius}
+          marginTop={styles.topRow.height}
+          opacity={0.5}
+          backgroundColor={styles.bigBox.backgroundColor}
+        />
         <View style={[styles.innerBox, { top: 70 }]}>
           <View style={[styles.inputContainer, { flex: 2 / 3 }]}>
             <TextInput

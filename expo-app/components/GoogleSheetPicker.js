@@ -12,6 +12,7 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import * as FileSystem from "expo-file-system";
 
 import { loadSavedSheets, addNewSheet } from "../fun/googleSheets";
+import { LoadingOverlay } from "./Loading";
 
 export default function GoogleSheetPicker({
   setCurrentSheet,
@@ -21,22 +22,30 @@ export default function GoogleSheetPicker({
 }) {
   const [sheets, setSheets] = useState([]);
   const [newSheetUrl, setNewSheetUrl] = useState("");
-  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     loadSavedSheets(setSheets);
   }, []);
 
   async function newSheet() {
-    const [newSheetName, newSheetId] = await addNewSheet(
-      newSheetUrl,
-      setNewSheetUrl,
-      sheets,
-      setSheets,
-      setError
-    );
-    setCurrentSheet(newSheetName);
-    setCurrentSheetId(newSheetId);
+    if (!isLoading) {
+      setIsLoading(true);
+      const [newSheetName, newSheetId] = await addNewSheet(
+        newSheetUrl,
+        setNewSheetUrl,
+        sheets,
+        setSheets
+      );
+      setIsLoading(false);
+      setNewSheetUrl("");
+      if (newSheetName) {
+        setCurrentSheet(newSheetName);
+        setCurrentSheetId(newSheetId);
+      }
+    } else {
+      console.warn("Aborted addNewSheet: something is still loading.");
+    }
   }
 
   async function changeSheet(id, name) {
@@ -67,13 +76,24 @@ export default function GoogleSheetPicker({
     <View style={styles.container}>
       <View style={styles.inputSuperContainer}>
         <Text style={{ color: "white", fontSize: 10 }}>
-          Afegeix un nou full amb URL o codi
+          {isLoading
+            ? "S'està afegint el nou full..."
+            : "Afegeix un nou full amb URL o codi"}
         </Text>
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
             value={newSheetUrl}
             onChangeText={setNewSheetUrl}
+          />
+          <LoadingOverlay
+            visible={isLoading}
+            borderRadius={4}
+            marginTop={0}
+            color="white"
+            backgroundColor={styles.button.backgroundColor}
+            opacity={1}
+            scale={0.7}
           />
           <Pressable
             style={styles.button}
@@ -85,8 +105,6 @@ export default function GoogleSheetPicker({
           </Pressable>
         </View>
       </View>
-
-      {error ? <Text style={styles.error}>{error}</Text> : null}
 
       <FlatList
         data={sheets}
@@ -169,9 +187,5 @@ const styles = StyleSheet.create({
     width: "100%",
     flexDirection: "row",
     alignItems: "center",
-  },
-  error: {
-    color: "red",
-    marginBottom: 16,
   },
 });

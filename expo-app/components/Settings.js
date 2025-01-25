@@ -9,12 +9,7 @@ import {
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 
-import {
-  loginGoogle,
-  checkLoggedIn,
-  checkSession,
-  logoutGoogle,
-} from "../fun/googleFun.js";
+import { loginGoogle, checkLoggedIn, logoutGoogle } from "../fun/googleFun.js";
 import Button from "./Button";
 import CircleButton from "./CircleButton";
 import SettingsBox from "./SettingsBox";
