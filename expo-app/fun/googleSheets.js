@@ -87,8 +87,8 @@ export async function addSpendingToSheet(
   try {
     const sessionToken = await SecureStore.getItemAsync("sessionToken");
     console.log("Attempting to add spending to sheet", sheetId);
-    console.log(currentMonthLoc, currentYear, sheetName, sheetId);
-    await fetch(`${API_URL}/api/sheets/addspending`, {
+    console.log(type, currentMonthLoc, currentYear, sheetName, sheetId);
+    const response = await fetch(`${API_URL}/api/sheets/addspending`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -98,28 +98,34 @@ export async function addSpendingToSheet(
         sheetId,
         amount,
         type,
-        month,
-        year,
+        month: currentMonthLoc,
+        year: currentYear,
         colOffset,
         rowOffset,
       }),
     });
 
-    console.log(
-      "Added",
-      amount,
-      "under type",
-      type,
-      "for ",
-      currentMonthLoc,
-      currentYear,
-      "to",
-      sheetName,
-      "(" + sheetId + ") with offset (row, col)",
-      rowOffset,
-      colOffset
-    );
-    ToastAndroid.show("S'ha afegit la despesa.", ToastAndroid.SHORT);
+    console.log("Response status:", response.status);
+    if (response.status !== 200) {
+      const errorData = await response.json();
+      throw new Error(errorData.detail);
+    } else {
+      console.log(
+        "Added",
+        amount,
+        "under type",
+        type,
+        "for ",
+        currentMonthLoc,
+        currentYear,
+        "to",
+        sheetName,
+        "(" + sheetId + ") with offset (row, col)",
+        rowOffset,
+        colOffset
+      );
+      ToastAndroid.show("S'ha afegit la despesa.", ToastAndroid.SHORT);
+    }
   } catch (e) {
     console.error("Error adding spending:", e);
     ToastAndroid.show("No s'ha pogut afegir la despesa.", ToastAndroid.SHORT);

@@ -289,7 +289,10 @@ async def edit_spreadsheet(
             range=type_range
         ).execute()
         
+        print(type_range)
+        print(result)
         types = result.get('values', [[]])
+        print(types)
         try:
             row_index = [row[0] for row in types].index(sheet_data.type) + sheet_data.rowOffset
         except ValueError:

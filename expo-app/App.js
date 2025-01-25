@@ -142,10 +142,10 @@ export default function App() {
               setTypeSpend={setSpendType}
               addTypeAction={() => setShowAddType(true)}
               exitAction={() => setShowAddSpending(false)}
-              colOffset={colOffset}
-              rowOffset={rowOffset}
               currentMonthLoc={currentMonthLoc}
               currentYear={currentYear}
+              colOffset={colOffset}
+              rowOffset={rowOffset}
             />
           ) : showFilePicker ? (
             <View>

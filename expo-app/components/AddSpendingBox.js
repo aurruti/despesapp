@@ -23,6 +23,8 @@ export default function AddSpendingBox({
   setTypeSpend,
   addTypeAction,
   exitAction,
+  currentMonthLoc,
+  currentYear,
   colOffset,
   rowOffset,
 }) {
@@ -123,14 +125,13 @@ export default function AddSpendingBox({
   };
 
   const triggerAddSpending = async () => {
-    console.log("triggerAddSpending");
     await addSpendingToSheet(
       amount,
       typeSpend,
       currentSheet,
       currentSheetId,
-      month,
-      year,
+      currentMonthLoc,
+      currentYear,
       colOffset,
       rowOffset
     );
