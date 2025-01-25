@@ -1,7 +1,9 @@
-import { API_URL, GOOGLE_CLIENT_ID } from "@env";
 import * as WebBrowser from "expo-web-browser";
 import * as SecureStore from "expo-secure-store";
 import { ToastAndroid, Linking } from "react-native";
+
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 
 export async function checkLoggedIn(setLoggedIn) {
   const sessionName = await checkSession();

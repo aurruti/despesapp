@@ -26,7 +26,7 @@ export default function GoogleSheetPicker({
 
   useEffect(() => {
     loadSavedSheets(setSheets);
-  }, []);
+  }, [loadSavedSheets, setSheets]);
 
   async function newSheet() {
     if (!isLoading) {

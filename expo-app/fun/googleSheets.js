@@ -1,7 +1,7 @@
-import { API_URL } from "@env";
 import * as SecureStore from "expo-secure-store";
 import { Alert, ToastAndroid } from "react-native";
 
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
 const STORAGE_KEY = "accessedSheets";
 
 export async function loadSavedSheets(setSheets) {
@@ -90,8 +90,6 @@ export async function addSpendingToSheet(
 ) {
   try {
     const sessionToken = await SecureStore.getItemAsync("sessionToken");
-    console.log("Attempting to add spending to sheet", sheetId);
-    console.log(type, currentMonthLoc, currentYear, sheetName, sheetId);
     const response = await fetch(`${API_URL}/api/sheets/addspending`, {
       method: "POST",
       headers: {
@@ -109,7 +107,6 @@ export async function addSpendingToSheet(
       }),
     });
 
-    console.log("Response status:", response.status);
     if (response.status !== 200) {
       const errorData = await response.json();
       if (response.status === 500) {

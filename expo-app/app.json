@@ -2,8 +2,8 @@
   "expo": {
     "name": "DespesApp",
     "slug": "despesapp",
-    "version": "0.2.0",
-    "icon": "./assets/kikki_icon.jpeg",
+    "version": "0.2.1",
+    "icon": "./assets/kikki_icon.png",
     "splash": {
       "image": "./assets/kikki_splash.png",
       "resizeMode": "contain",
@@ -11,7 +11,8 @@
     },
     "newArchEnabled": true,
     "updates": {
-      "fallbackToCacheTimeout": 0
+      "fallbackToCacheTimeout": 0,
+      "url": "https://u.expo.dev/68c68e08-9318-43cd-a1bc-c84554a8f39c"
     },
     "assetBundlePatterns": ["**/*"],
     "scheme": "cat.aurruti.despesapp",
@@ -22,7 +23,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/kikki_icon.jpeg",
+        "foregroundImage": "./assets/kikki_icon.png",
         "backgroundColor": "#FFFFFF"
       },
       "package": "cat.aurruti.despesapp",
@@ -42,7 +43,7 @@
       ]
     },
     "web": {
-      "favicon": "./assets/kikki_icon.jpeg"
+      "favicon": "./assets/kikki_icon.png"
     },
     "extra": {
       "eas": {
@@ -50,6 +51,9 @@
       }
     },
     "owner": "aurruti",
-    "plugins": ["expo-secure-store", "expo-asset"]
+    "plugins": ["expo-secure-store", "expo-asset"],
+    "runtimeVersion": {
+      "policy": "appVersion"
+    }
   }
 }

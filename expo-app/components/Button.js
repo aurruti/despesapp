@@ -91,7 +91,17 @@ export default function Button({ label, theme, onPress, background }) {
             size={18}
             color="black"
           />
-          <Text style={[styles.buttonLabel, { color: "#25292e" }]}>
+          <Text
+            style={[
+              styles.buttonLabel,
+              {
+                color: "#25292e",
+                maxWidth: "80%",
+              },
+            ]}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
             {label}
           </Text>
         </Pressable>
@@ -265,7 +275,12 @@ export default function Button({ label, theme, onPress, background }) {
           onPress={onPress}
         >
           <Text
-            style={[styles.buttonLabel, { color: "#25292e", fontSize: 14 }]}
+            style={[
+              styles.buttonLabel,
+              { color: "#25292e", fontSize: 14, textAlign: "center" },
+            ]}
+            numberOfLines={1}
+            ellipsizeMode="tail"
           >
             {label}
           </Text>
@@ -289,8 +304,15 @@ export default function Button({ label, theme, onPress, background }) {
           <Text
             style={[
               styles.buttonLabel,
-              { color: "#25292e", fontSize: 14, fontWeight: "bold" },
+              {
+                color: "#25292e",
+                fontSize: 14,
+                fontWeight: "bold",
+                textAlign: "center",
+              },
             ]}
+            numberOfLines={1}
+            ellipsizeMode="head"
           >
             {label}
           </Text>

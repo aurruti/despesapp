@@ -29,11 +29,11 @@ export default function SettingsBox({
     };
 
     loadPreference();
-  }, [preferencesFilePath, preferenceName]);
+  }, []);
 
   const handleText = async () => {
     try {
-      preferences = await settingsEdition(
+      await settingsEdition(
         preferencesFilePath,
         preferenceName,
         preferenceValue
@@ -41,6 +41,9 @@ export default function SettingsBox({
       ToastAndroid.show(
         "S'han actualitzat les preferències",
         ToastAndroid.SHORT
+      );
+      preferences = await JSON.parse(
+        await FileSystem.readAsStringAsync(preferencesFilePath)
       );
       console.log("New preferences saved: ", preferences);
     } catch (error) {
@@ -65,11 +68,17 @@ export default function SettingsBox({
         setPreferenceValue(formattedText);
         break;
       case "colOffset":
-        formattedText = text.replace(/[^0-9]/g, "");
+        formattedText = text.replace(/(?!^-)[^-0-9]/g, "");
+        if (formattedText.indexOf("-") > 0) {
+          formattedText = formattedText.replace(/-/g, "");
+        }
         setPreferenceValue(formattedText);
         break;
       case "rowOffset":
-        formattedText = text.replace(/[^0-9]/g, "");
+        formattedText = text.replace(/(?!^-)[^-0-9]/g, "");
+        if (formattedText.indexOf("-") > 0) {
+          formattedText = formattedText.replace(/-/g, "");
+        }
         setPreferenceValue(formattedText);
         break;
     }

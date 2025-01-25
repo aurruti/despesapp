@@ -1,9 +1,36 @@
 # DespesApp
 
-DespesApp is a tool to simplify spending tracking. It has been envisoned as an easier way to udpate your Google sheets with your expenses, without having to do so with the often cumbersome Google sheets app.
-Developed with React Native + Expo for the frontend; while a relatively simple fastAPI handles backend calls. For the backend deployement and more, take a look at the server actually handling this, https://github.com/aurruti/naidd .
+DespesApp is a tool to simplify spending tracking. It has been envisoned as an easier way to udpate your Google Sheets with your expenses, without having to do so with the often cumbersome Google Sheets app.
 
-This is very much WIP!
+Developed with React Native + Expo for the frontend; while a relatively simple fastAPI handles backend calls. For the backend deployement and more, take a look at the server actually handling this, the Nåidd project: https://github.com/aurruti/naidd .
+
+## How-to
+
+The current release (version 0.2.1) is only compatible with Android phones. Just install the APK and launch it! Remeber to accept foreign apk origins when installing. Note that the UI is completely in Catalan for the moment; while month localizations are only available in Catalan and English. I do not plan on working on localization for now, but if you are interested do let me know.
+
+### Logging in and adding sheets
+
+To log in, simply go to Settings (top-right corner gear) and log in through the giant "Log in with Google" button. The current version of the app has not been review by Google, meaning the functionalities are reserved to authorized "tester" email adresses.
+
+Sheets are added from the bottom left button, by pasting either the full adress of the Google Sheets file or its ID.
+
+### Expected sheet structure
+
+Edition of your Google Sheets requires that your expense tracking sheet is structured as follows:
+
+- Sheet name marks the year (i.e. "2025").
+- Column headers, strictly on the first (1) row, mark the month by name according to your language settings (i.e. "Octubre", "May", ...).
+- Row headers, striclty on the first (A) column, mark the spending type by name. The name should match exactly your type name defined in the app.
+
+### Known issues and limitations
+
+- Once added, sheets cannot be removed (lol).
+
+- If using the app for too long on one go (just how many expenses do you have?), it is possible for the login token to expire without warning. This is because for now the token refresh happens only on startup. If this happens, you can either just restart the app (removing it from background apps). If that does not solve the issue, try logging out and back in again.
+
+- Column and Row offset settings are global rather than sheet-specific. This means that if you are working with multiple sheets with different offset needs you will have to switch these manually.
+
+You can see an example sheets: https://docs.google.com/spreadsheets/d/1YcTP6GPbXzbwf53ooIaO_Nggs-okboPcYxu-incYyLA/edit
 
 ## Acknogledgements
 

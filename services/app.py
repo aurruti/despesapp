@@ -286,7 +286,7 @@ async def edit_spreadsheet(
         types = result.get('values', [[]])
         try:
             filtered_types = [row for row in types if row]
-            row_index = [row[0] for row in filtered_types].index(sheet_data.type) + sheet_data.rowOffset + 1
+            row_index = [row[0] for row in filtered_types].index(sheet_data.type) + sheet_data.rowOffset
         except ValueError:
             raise HTTPException(status_code=404, detail=f"Type {sheet_data.type} not found")
 
@@ -303,7 +303,6 @@ async def edit_spreadsheet(
         ).execute()
         
         current_value = current_cell.get('values', [['']])[0][0] if current_cell.get('values') else ''
-        print(current_value)
 
         # Prepare new value
         amount = str(sheet_data.amount).replace(".", ",")
@@ -311,7 +310,6 @@ async def edit_spreadsheet(
             new_value = f"={amount}"
         else:
             new_value = f"{current_value}+{amount}"
-        print(new_value)
 
         # Update the cell
         body = {
@@ -323,7 +321,6 @@ async def edit_spreadsheet(
             valueInputOption='USER_ENTERED',
             body=body
         ).execute()
-        print(result)
 
         return JSONResponse({
             "status": "Success",

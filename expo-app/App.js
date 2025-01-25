@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Alert, ToastAndroid, View, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import * as FileSystem from "expo-file-system";
 
@@ -88,9 +88,7 @@ export default function App() {
     const TokenRefreshWrap = async () => {
       await checkLoggedIn(setLoggedIn);
       setTimeout(async () => {
-        if (loggedIn) {
-          await refreshToken();
-        }
+        await refreshToken();
         setIsLoading(false);
       }, 500);
     };
