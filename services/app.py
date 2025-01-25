@@ -237,8 +237,6 @@ async def edit_spreadsheet(
 ):
     """Edit a specific cell in a Google Spreadsheet to add a spending."""
 
-    print("Data recieved" + str(sheet_data))
-
     # Retrieve access token
     async with db.execute(
         "SELECT access_token FROM tokens WHERE user_id = ?",
@@ -255,8 +253,6 @@ async def edit_spreadsheet(
         # Get sheet metadata
         spreadsheet = service.spreadsheets()
         sheet_metadata = spreadsheet.get(spreadsheetId=sheet_data.sheetId).execute()
-        
-        print(sheet_metadata)
 
         # Find the specific sheet by year
         sheet_name = next(
@@ -290,11 +286,10 @@ async def edit_spreadsheet(
         ).execute()
         
         types = result.get('values', [[]])
-        print(types)
         try:
             filtered_types = [row for row in types if row]
             print(filtered_types)
-            row_index = [row[0] for row in filtered_types].index(sheet_data.type) + sheet_data.rowOffset
+            row_index = [row[0] for row in filtered_types].index(sheet_data.type) + sheet_data.rowOffset + 1
         except ValueError:
             raise HTTPException(status_code=404, detail=f"Type {sheet_data.type} not found")
         print(row_index)
