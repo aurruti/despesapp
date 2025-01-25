@@ -1,6 +1,6 @@
 import { API_URL } from "@env";
 import * as SecureStore from "expo-secure-store";
-import { ToastAndroid } from "react-native";
+import { Alert, ToastAndroid } from "react-native";
 
 const STORAGE_KEY = "accessedSheets";
 
@@ -108,7 +108,11 @@ export async function addSpendingToSheet(
     console.log("Response status:", response.status);
     if (response.status !== 200) {
       const errorData = await response.json();
-      throw new Error(errorData.detail);
+      if (response.status === 500) {
+        Alert.alert("No s'ha pogut afegir la despesa", errorData.detail);
+      } else {
+        throw new Error(errorData.detail);
+      }
     } else {
       console.log(
         "Added",
@@ -128,6 +132,6 @@ export async function addSpendingToSheet(
     }
   } catch (e) {
     console.error("Error adding spending:", e);
-    ToastAndroid.show("No s'ha pogut afegir la despesa.", ToastAndroid.SHORT);
+    // ToastAndroid.show("No s'ha pogut afegir la despesa.", ToastAndroid.SHORT);
   }
 }

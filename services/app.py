@@ -262,8 +262,7 @@ async def edit_spreadsheet(
         )
         if not sheet_name:
             raise HTTPException(status_code=404, detail=f"Sheet for year {sheet_data.year} not found")
-        print(sheet_name)
-
+        
         # Find column by month
         column_range = f"{sheet_name}!1:1"
         result = spreadsheet.values().get(
@@ -276,7 +275,6 @@ async def edit_spreadsheet(
             col_index = headers.index(sheet_data.month) + sheet_data.colOffset
         except ValueError:
             raise HTTPException(status_code=404, detail=f"Month {sheet_data.month} not found")
-        print(col_index)
 
         # Find row by type
         type_range = f"{sheet_name}!A:A"
@@ -288,32 +286,31 @@ async def edit_spreadsheet(
         types = result.get('values', [[]])
         try:
             filtered_types = [row for row in types if row]
-            print(filtered_types)
             row_index = [row[0] for row in filtered_types].index(sheet_data.type) + sheet_data.rowOffset + 1
         except ValueError:
             raise HTTPException(status_code=404, detail=f"Type {sheet_data.type} not found")
-        print(row_index)
 
         # Construct cell reference
         col_letter = chr(65 + col_index)  # A is 65 in ASCII
         cell = f"{col_letter}{row_index + 1}"
         cell_range = f"{sheet_name}!{cell}"
-        print(cell_range)
 
         # Read current cell value
         current_cell = spreadsheet.values().get(
             spreadsheetId=sheet_data.sheetId, 
-            range=cell_range
+            range=cell_range,
+            valueRenderOption='FORMULA'
         ).execute()
         
         current_value = current_cell.get('values', [['']])[0][0] if current_cell.get('values') else ''
         print(current_value)
 
         # Prepare new value
+        amount = str(sheet_data.amount).replace(".", ",")
         if not current_value:
-            new_value = f"={sheet_data.amount}"
+            new_value = f"={amount}"
         else:
-            new_value = f"{current_value}+{sheet_data.amount}"
+            new_value = f"{current_value}+{amount}"
         print(new_value)
 
         # Update the cell
